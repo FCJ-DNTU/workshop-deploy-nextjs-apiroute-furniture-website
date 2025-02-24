@@ -1,40 +1,43 @@
 +++
-title = "Thiết lập Tài Khoản AWS"
-date = 2021
+title = "Workshop Triển Khai Next.js 14 Fullstack Trên AWS EC2 Với CloudFront & DocumentDB"
+date = 2025
 weight = 1
 chapter = false
 +++
 
-# Tạo tài khoản AWS đầu tiên
+# Workshop: Triển Khai Next.js 14 Fullstack Trên AWS EC2 Với CloudFront & DocumentDB
 
-#### Tổng quan
-Trong bài lab đầu tiên này, bạn sẽ tạo mới **tài khoản AWS** đầu tiên của mình, tạo **MFA** (Multi-factor Authentication) để gia tăng bảo mật tài khoản của bạn. Bước tiếp theo bạn sẽ tạo **Admin Group**, **Admin User** để quản lý quyền truy cập vào các tài nguyên trong tài khoản của mình thay vì sử dụng user root.\
-Cuối cùng, nếu quá trình xác thực tài khoản của bạn có vấn đề, bạn sẽ được hướng dẫn hỗ trợ xác thực tài khoản với **AWS Support**.
+### Tổng quan
 
-#### Tài khoản AWS (AWS Account)
-**Tài khoản AWS** là phương tiện để bạn có thể truy cập và sử dụng những tài nguyên và dịch vụ của AWS. Theo mặc định, mỗi tài khoản AWS sẽ có một *root user*. *Root user* có toàn quyền với tài khoản AWS của bạn, và quyền hạn của root user không thể bị giới hạn. Nếu bạn mới sử dụng tài khoản AWS lần đầu tiên, bạn sẽ truy cập vào tài khoản dưới danh nghĩa của *root user*.
+Trong workshop này, bạn sẽ học cách triển khai một ứng dụng Fullstack NextJS 14 API Routes trên AWS, sử dụng EC2,
+DocumentDB, IAM và CloudFront để tối ưu hiệu suất và tối ưu chi phí
 
-{{% notice note %}}
-Chính vì quyền hạn của **root user** không thể bị giới hạn, AWS khuyên bạn không nên sử dụng trực tiếp *root user* cho bất kỳ công tác nào. Thay vào đó, bạn nên tạo ra một *IAM User* và trao quyền quản trị cho *IAM User* đó để dễ dàng quản lý và giảm thiểu rủi ro.
-{{% /notice %}}
+![Workshop Architecture](/images/workshop_architecture.png)
 
-#### MFA (Multi-factor Authentication)
-**MFA** là một tính năng được sử dụng để gia tăng bảo mật của tài khoản AWS. Nếu MFA được kích hoạt, bạn sẽ phải nhập mã OTP (One-time Password) mỗi lần bạn đăng nhập vào tài khoản AWS.
+### Mục tiêu:
 
-#### IAM Group 
-**IAM Group**  là một công cụ quản lý người dùng (*IAM User*) của AWS. Một IAM Group có thể chứa nhiều IAM User. Các IAM User ở trong một IAM Group đều hưởng chung quyền hạn mà IAM Group đó được gán cho.
+- Hiểu cách tạo và cấu hình EC2, DocumentDB, CloudFront và IAM trên AWS.
 
-#### IAM User
-**IAM User** là một đơn vị người dùng của AWS. Khi bạn đăng nhập vào AWS, bạn sẽ phải đăng nhập dưới danh nghĩa của một IAM User. Nếu bạn mới đăng nhập vào AWS lần đầu tiên, bạn sẽ đăng nhập dưới danh nghĩa của *root user* (tạm dịch là người dùng gốc). Ngoài *root user* ra, bạn có thể tạo ra nhiều IAM User khác để cho phép người khác truy cập **dài hạn** vào tài nguyên AWS trong tài khoản AWS của bạn.
+- Triển khai ứng dụng NextJS 14 Fullstack trên EC2.
 
+- Kết nối và sử dụng DocumentDB từ EC2, bao gồm cách migration dữ liệu từ MongoDB lên DocumentDB.
 
-#### AWS Support
-**AWS Support** là một đơn vị cung cấp các dịch vụ hỗ trợ khách hàng của AWS.
+- Hiểu cách cấu hình CloudFront làm reverse proxy để tăng tốc API Routes của NextJS lên EC2.
 
+### Yêu cầu:
 
-#### Nội dung chính
+- Tài khoản AWS với quyền truy cập IAM.
 
-1. [Tạo tài khoản AWS](1-create-new-aws-account/)
-2. [Thiết lập MFA cho tài khoản AWS (Root)](2-mfa-setup-for-aws-user-(root)/)
-3. [Tài khoản và Nhóm Admin](3-create-admin-user-and-group/)
-4. [Hỗ trợ Xác thực Tài khoản](4-verify-new-account/)
+- Một máy tính với SSH client (như Terminal hoặc PuTTY).
+
+### Nội dung
+
+1. [Giới thiệu](1-introduce/)
+2. [Hạn chế quyền truy cập với IAM Service](2-restrict-access/)
+3. [Khởi tạo VPC](3-create-vpc-instance/)
+4. [Khởi tạo EC2 Instance](4-create-ec2-instance/)
+5. [Khởi tạo DocumentDB](5-create-documentdb-instance/)
+6. [Triển khai ứng dụng lên EC2](6-deploy-the-application-to-ec2/)
+7. [Khởi tạo CloudFront](7-create-cloudfront/)
+8. [Tính toán chi phí & tối ưu](8-cost-calculation-optimization/)
+9. [Dọn dẹp tài nguyên](9-clean-up/)
