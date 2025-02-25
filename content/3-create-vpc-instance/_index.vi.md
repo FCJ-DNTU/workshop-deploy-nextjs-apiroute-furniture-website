@@ -11,7 +11,7 @@ pre: "<b>3. </b>"
 
 Nội dung:
 
-- [**3. Chuẩn bị VPC Instance**](#)
-  - [**3.1. Tạo VPC Instance**](3.1-create-vpc)
-  - [**3.2. Tạo VPC Security Group**](3.2-create-vpc-sg)
-  - [**3.3 Tạo Database Subnet Group**](3.3-create-db-sg)
+- [**3. Khởi tạo VPC Instance**](#)
+- [**3.1. Tạo VPC Instance**](3.1-create-vpc)
+- [**3.2. Tạo VPC Security Group**](3.2-create-vpc-sg)
+- [**3.3 Tạo Database Subnet Group**](3.3-create-db-sg)

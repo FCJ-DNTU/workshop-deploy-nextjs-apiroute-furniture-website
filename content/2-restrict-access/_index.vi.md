@@ -16,11 +16,12 @@ chúng ta sẽ tạo policy để hạn chế user chỉ có thể tương tác 
 
 #### 1. Truy cập AWS IAM Management Console
 
-![iam-management.png](/images/2-restrict-access/iam-management.png)
+![iam-management.png](/images/2-restrict-access/2.1.png)
 
 #### 2. Tạo Custom Policies
 
-2.1. Tại thanh điều hướng bên trái, chọn [Policies](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/policies)
+2.1. Tại thanh điều hướng bên trái, chọn
+[Policies](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/policies)
 
 2.2. Tại giao diện **Policies**, chọn **Create policy**
 
@@ -28,20 +29,20 @@ chúng ta sẽ tạo policy để hạn chế user chỉ có thể tương tác 
 
 ```json
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "VisualEditor0",
-      "Effect": "Allow",
-      "Action": "ec2:*",
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "aws:RequestedRegion": "ap-southeast-1"
-        }
-      }
-    }
-  ]
+"Version": "2012-10-17",
+"Statement": [
+{
+"Sid": "VisualEditor0",
+"Effect": "Allow",
+"Action": "ec2:*",
+"Resource": "*",
+"Condition": {
+"StringEquals": {
+"aws:RequestedRegion": "ap-southeast-1"
+}
+}
+}
+]
 }
 ```
 
@@ -53,14 +54,16 @@ chúng ta sẽ tạo policy để hạn chế user chỉ có thể tương tác 
 - Đặt tên policy tại **Policy name**, **Description**.
 - Sau đó chọn **create policy**
 
-  ![review-and-create](/images/2-restrict-access/restricted-policy-1.png)
+![review-and-create](/images/2-restrict-access/restricted-policy-1.png)
 
 #### 3. Tạo một User Group và Policy
 
 {{% notice note %}}
-Để policy bên trên có thể tái sử dụng, chúng ta có thể gán vào IAM Group. Những IAM User trong mộtGroup đều có quyền hạn như nhau
+Để policy bên trên có thể tái sử dụng, chúng ta có thể gán vào IAM Group. Những IAM User trong mộtGroup đều có quyền hạn
+như nhau
 {{% /notice %}}
-3.1. Truy cập [User groups](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/groups) bên thanh điều hướng bên trái
+3.1. Truy cập [User groups](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/groups) bên thanh
+điều hướng bên trái
 
 3.2. Trong giao diện **User groups**, chọn **Create group**
 
@@ -68,12 +71,13 @@ chúng ta sẽ tạo policy để hạn chế user chỉ có thể tương tác 
 
 - Đặt tên **User group name** và **gán custom policy** vừa tạo.
 - Chọn **Create user group**
-  ![create-user-group](/images/2-restrict-access/create-user-group.png)
-  ![review-user-group](/images/2-restrict-access/review-user-group.png)
+![create-user-group](/images/2-restrict-access/create-user-group.png)
+![review-user-group](/images/2-restrict-access/review-user-group.png)
 
 #### 4. Tạo User và gán vào User Group
 
-4.1. Truy cập [Users](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/users) bên thanh điều hướng bên trái
+4.1. Truy cập [Users](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/users) bên thanh điều
+hướng bên trái
 
 4.2. Chọn **Create user**
 
@@ -84,34 +88,34 @@ chúng ta sẽ tạo policy để hạn chế user chỉ có thể tương tác 
 - Chọn **I want to create an IAM user**
 - Đặt **custom password**
 - Chọn **Next**
-  ![specify-user-detail](/images/2-restrict-access/specify-user-detail.png)
+![specify-user-detail](/images/2-restrict-access/specify-user-detail.png)
 
-  4.4. Tại **bước 2 - Set permissions**
+4.4. Tại **bước 2 - Set permissions**
 
 - Chọn **Add user to group**
 - Chọn group chúng ta vừa tạo e.g. **restricted_ec2_region_group**
 - Chọn **Next**
-  ![set-permission](/images/2-restrict-access/set-permission.png)
+![set-permission](/images/2-restrict-access/set-permission.png)
 
-  4.5. Tại **bước 3 - Review and Create**
+4.5. Tại **bước 3 - Review and Create**
 
 - Kiểm tra thông tin user và permission
 - Chọn **Create user**
-  ![review](/images/2-restrict-access/review.png)
+![review](/images/2-restrict-access/review.png)
 
-  4.6. Tại **bước 4 - Retrieve password**
+4.6. Tại **bước 4 - Retrieve password**
 
 - Lưu trữ hoặc tải xuống bản **.csv** để quản lý user
-  ![review-pwd](/images/2-restrict-access/review-pwd.png)
+![review-pwd](/images/2-restrict-access/review-pwd.png)
 
-  4.7. Đăng nhập vào tài khoản IAM User
+4.7. Đăng nhập vào tài khoản IAM User
 
 - Copy **sign-in URL**
 - Đăng nhập bằng **username** và **password**
 - Thao tác thay đổi **Password**
-  ![change-password](/images/2-restrict-access/change-password.png)
+![change-password](/images/2-restrict-access/change-password.png)
 - Kiểm tra dịch vụ EC2 trên region **us-east-1** => Policy đã hạn chế quyền sử dụng EC2 tại region này
-  ![restricted-region.png](/images/2-restrict-access/restricted-region.png)
+![restricted-region.png](/images/2-restrict-access/restricted-region.png)
 - Kiểm tra dịch vụ EC2 trên region **ap-southeast-1**
-  ![check_region.png](/images/2-restrict-access/check_region.png)
+![check_region.png](/images/2-restrict-access/check_region.png)
 - Hoàn thành!
