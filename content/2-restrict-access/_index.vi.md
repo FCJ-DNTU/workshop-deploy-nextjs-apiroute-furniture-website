@@ -69,8 +69,7 @@ Cho phép user sử dụng các thao tác của EC2 chỉ trong region ap-southe
 Để policy bên trên có thể tái sử dụng, chúng ta có thể gán vào IAM Group. Những IAM User trong một Group đều có quyền hạn
 như nhau
 {{% /notice %}}
-3.1. Truy cập [User groups](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/groups) bên thanh
-điều hướng bên trái
+3.1. Truy cập [User groups](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/groups) bên thanh điều hướng bên trái
 ![user-group](/images/2-restrict-access/2.6.png)
 
 3.2. Trong giao diện **User groups**, chọn **Create group**
@@ -86,8 +85,7 @@ như nhau
 
 #### 4. Tạo User và gán vào User Group
 
-4.1. Truy cập [Users](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/users) bên thanh điều
-hướng bên trái
+4.1. Truy cập [Users](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/users) bên thanh điều hướng bên trái
 ![user-tab](/images/2-restrict-access/2.9.png)
 
 4.2. Chọn **Create user**

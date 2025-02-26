@@ -22,108 +22,132 @@ In this section, we will create a policy to restrict a user to only interact wit
 
 2.1. On the left navigation menu, select
 [Policies](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/policies).
+![policies.png](/images/2-restrict-access/2.2.png)
 
 2.2. In the **Policies** interface, click **Create policy**.
+![create-policy.png](/images/2-restrict-access/2.3.png)
 
-2.3. **Step 1 - Specify permissions**:
+2.3.
+
+**Step 1 - Specify permissions**:
 
 - Go to the **JSON tab**, paste the following JSON into the **Policy Editor**, and click **Next**.
 
 ```json
 {
-"Version": "2012-10-17",
-"Statement": [
-{
-"Sid": "VisualEditor0",
-"Effect": "Allow",
-"Action": "ec2:*",
-"Resource": "*",
-"Condition": {
-"StringEquals": {
-"aws:RequestedRegion": "ap-southeast-1"
-}
-}
-}
-]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "ec2:*",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-1"
+        }
+      }
+    }
+  ]
 }
 ```
 
+![Specify permissions.png](/images/2-restrict-access/2.4.png)
+
 {{% notice note %}}
-This JSON allows interactions with EC2 resources but only in the **ap-southeast-1** region.
+This policy allows users to manage EC2 instances only in the ap-southeast-1 region.
 {{% /notice %}}
 
-2.4. **Step 2 - Review and Create**:
+2.4.
 
-- Provide a name and description for the policy.
+**Step 2 - Review and Create**:
+
+- Enter a **Policy Name**: `ec2-restricted-region`.
+- Enter a **Description**: `Allow access to EC2 only in ap-southeast-1`.
 - Click **Create policy**.
 
-![review-and-create](/images/2-restrict-access/restricted-policy-1.png)
+![review-and-create](/images/2-restrict-access/2.5.png)
 
 #### 3. Create a User Group and Assign the Policy
 
 {{% notice note %}}
-To reuse the above policy, assign it to an IAM Group. All IAM Users in the group will share the same permissions.
+To reuse this policy, assign it to an IAM Group. All IAM Users in this group will have the same permissions.
 {{% /notice %}}
 
-3.1. Access [User groups](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/groups) from the left
-navigation menu.
+3.1. Access [User groups](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/groups) from the left navigation menu.
+![user-group](/images/2-restrict-access/2.6.png)
 
 3.2. In the **User groups** interface, click **Create group**.
 
 3.3. In the **Create user group** interface:
 
-- Name the group and assign the custom policy created earlier.
+- Enter **User Group Name**: `ec2-restricted-group`.
+- Under **Filter by Type**, select **Customer Managed**.
+- Choose the policy created earlier.
 - Click **Create user group**.
-![create-user-group](/images/2-restrict-access/create-user-group.png)
-![review-user-group](/images/2-restrict-access/review-user-group.png)
+  ![create-user-group](/images/2-restrict-access/2.7.png)
+- After creation, you should see a summary like this:
+  ![review-user-group](/images/2-restrict-access/2.8.png)
 
 #### 4. Create a User and Assign Them to the Group
 
-4.1. Access [Users](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/users) from the left
-navigation menu.
+4.1. Access [Users](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/users) from the left navigation menu.
+![user-tab](/images/2-restrict-access/2.9.png)
 
 4.2. Click **Create user**.
 
-4.3. **Step 1 - Specify user details**:
+4.3.
 
-- Enter a **username**.
+**Step 1 - Specify user details**:
+
+- Enter a **username**: `restricted_user`.
 - Select **Provide user access to the AWS Management Console**.
 - Choose **I want to create an IAM user**.
-- Set a **custom password**.
+- Set a **custom password**: `restricted_user1`.
 - Click **Next**.
-![specify-user-detail](/images/2-restrict-access/specify-user-detail.png)
+  ![specify-user-detail](/images/2-restrict-access/2.10.png)
 
-4.4. **Step 2 - Set permissions**:
+  4.4.
+
+  **Step 2 - Set permissions**:
 
 - Select **Add user to group**.
-- Choose the group created earlier (e.g., **restricted_ec2_region_group**).
+- Choose the group created earlier (e.g., **ec2-restricted-group**).
 - Click **Next**.
-![set-permission](/images/2-restrict-access/set-permission.png)
+  ![set-permission](/images/2-restrict-access/2.11.png)
 
-4.5. **Step 3 - Review and Create**:
+  4.5.
 
-- Review the user and permissions.
+  **Step 3 - Review and Create**:
+
+- Review the **user** and **permissions**.
 - Click **Create user**.
-![review](/images/2-restrict-access/review.png)
+  ![review](/images/2-restrict-access/2.12.png)
 
-4.6. **Step 4 - Retrieve password**:
+  4.6.
+
+  **Step 4 - Retrieve password**:
 
 - Save or download the **.csv** file to manage user credentials.
-![review-pwd](/images/2-restrict-access/review-pwd.png)
+  ![review-pwd](/images/2-restrict-access/2.13.png)
 
-4.7. Log in as the IAM User:
+  4.7. Log in as the IAM User:
 
 - Copy the **sign-in URL**.
-- Log in using the **username** and **password**.
-- Update the **password** when prompted.
-![change-password](/images/2-restrict-access/change-password.png)
+- Log in using the **username**: `restricted_user` and **password**: `restricted_user1`.
+  ![sign-in](/images/2-restrict-access/2.14.png)
+- After signing in, change your password.
+  ![change-password](/images/2-restrict-access/2.15.png)
 
 #### Testing:
 
-- Check the EC2 service in **us-east-1**: The policy should restrict access in this region.
-![restricted-region.png](/images/2-restrict-access/restricted-region.png)
+- Check the EC2 service in **us-east-2**: The policy should restrict access in this region.
+  ![restricted-region.png](/images/2-restrict-access/2.16.png)
 
 - Check the EC2 service in **ap-southeast-1**: Access should be allowed.
-![check_region.png](/images/2-restrict-access/check_region.png)
+  ![check_region.png](/images/2-restrict-access/2.17.png)
 
-# **Done!**
+{{< center >}}
+
+### **Done! 🚀**
+
+{{< /center >}}
