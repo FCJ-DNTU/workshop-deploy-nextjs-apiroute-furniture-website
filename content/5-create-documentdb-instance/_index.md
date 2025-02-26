@@ -1,5 +1,5 @@
 ---
-title: "Create AWS Relational Database Service"
+title: "Create AWS DocumentDB Service"
 date: 2025
 weight: 5
 chapter: false
@@ -8,32 +8,37 @@ pre: "<b>5. </b>"
 
 #### AWS Relational Database Service
 
-**Amazon Relational Database Service (Amazon RDS)** is a web service that makes it easier to set up, operate, and scale a relational database in the AWS Cloud.
+**Amazon Relational Database Service (Amazon RDS)** is a web service that makes it easier to set up, operate, and scale
+a relational database in the AWS Cloud.
 
 #### Create a DB Instance on AWS
 
 {{% notice info %}}
-Note: The procedure below assumes that **Standard create** is enabled and **Easy create** is not. This procedure uses MySQL as an example.
+Note: The procedure below assumes that **Standard create** is enabled and **Easy create** is not. This procedure uses
+MySQL as an example.
 {{% /notice %}}
 
 #### Steps to create a DB Instance:
 
-1. Log in to the **AWS Management Console** and open the Amazon RDS console at [RDS Console](https://console.aws.amazon.com/rds/).
+1. Log in to the **AWS Management Console** and open the Amazon RDS console at [RDS
+Console](https://console.aws.amazon.com/rds/).
 
-2. In the top-right corner of the **Amazon RDS** console, select the AWS region where you want to create the DB Instance.
+2. In the top-right corner of the **Amazon RDS** console, select the AWS region where you want to create the DB
+Instance.
 
 3. In the navigation pane, select **Databases**.
 
 4. Click **Create database**, then choose **Standard create**.
 
-   ![rds-interface.png](/images/5-create-rds-instance/rds-interface.png)
+![rds-interface.png](/images/5-create-rds-instance/rds-interface.png)
 
-5. For **Engine type**, select MariaDB, Microsoft SQL Server, MySQL, Oracle, or PostgreSQL. In this example, we use **MySQL**.
+5. For **Engine type**, select MariaDB, Microsoft SQL Server, MySQL, Oracle, or PostgreSQL. In this example, we use
+**MySQL**.
 
 6. For **Edition**, select **MySQL Community**.
 
 7. For **Version**, select the engine version (e.g., MySQL 8.0.39).
-   ![create-db.png](/images/5-create-rds-instance/create-db.png)
+![create-db.png](/images/5-create-rds-instance/create-db.png)
 
 8. Under **Templates**, choose the **Free tiers** template.
 
@@ -76,20 +81,23 @@ Note: The procedure below assumes that **Standard create** is enabled and **Easy
 ```shell
 $ sudo yum install mysql
 $ mysql -h <endpoint> -P 3306 -u admin -p <password>
-# $ mysql -h mysql-golang-db.c1a20mqwgeb9.ap-southeast-1.rds.amazonaws.com -P 3306 -u admin -pAdmin123
-```
+      # $ mysql -h mysql-golang-db.c1a20mqwgeb9.ap-southeast-1.rds.amazonaws.com -P 3306 -u admin -pAdmin123
+      ```
 
-![ec2-to-mysql.png](/images/5-create-rds-instance/ec2-to-mysql.png)
+      ![ec2-to-mysql.png](/images/5-create-rds-instance/ec2-to-mysql.png)
 
-16. Create a Database:
-    {{% notice tip %}}
-    The admin user cannot directly access the **mysql** database. It is recommended to create a new database for access. This issue is due to RDS privileges.
-    {{% /notice %}} > Since RDS is a managed service, to maintain system integrity and stability, superuser privileges are not granted to even the master user of the DB instance. Therefore, errors like this are expected, as the RDS MySQL master user by default does not have ADMIN, ROLE_ADMIN, or SUPER privileges.
+      16. Create a Database:
+      {{% notice tip %}}
+      The admin user cannot directly access the **mysql** database. It is recommended to create a new database for
+      access. This issue is due to RDS privileges.
+      {{% /notice %}} > Since RDS is a managed service, to maintain system integrity and stability, superuser privileges
+      are not granted to even the master user of the DB instance. Therefore, errors like this are expected, as the RDS
+      MySQL master user by default does not have ADMIN, ROLE_ADMIN, or SUPER privileges.
 
-```mysql
-CREATE DATABASE blog_db;
-# Query OK, 1 row affected (0.01 sec)
-```
+      ```mysql
+      CREATE DATABASE blog_db;
+      # Query OK, 1 row affected (0.01 sec)
+      ```
 
-17. Access the Database:
-    ![db.png](/images/5-create-rds-instance/db.png)
+      17. Access the Database:
+      ![db.png](/images/5-create-rds-instance/db.png)

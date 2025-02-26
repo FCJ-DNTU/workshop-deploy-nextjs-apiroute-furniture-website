@@ -1,5 +1,5 @@
 ---
-title: "Chuẩn bị VPC Instance"
+title: "Khởi tạo VPC Instance"
 date: 2025
 weight: 3
 chapter: false
