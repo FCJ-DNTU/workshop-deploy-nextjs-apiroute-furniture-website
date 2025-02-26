@@ -8,19 +8,30 @@ pre: "<b>3.1. </b>"
 
 #### Khái niệm về VPC
 
-Trong bài Workshop này, _Amazon Virtual Private Cloud (VPC)_ được sử dụng để tạo một mạng riêng ảo (private network), cho phép tổ chức và quản lý các tài nguyên trong một không gian mạng riêng biệt trên AWS.
+Trong Workshop này, **Amazon Virtual Private Cloud (VPC)** sẽ được sử dụng để tạo một mạng riêng ảo (private network). Điều này giúp tổ chức và quản lý các tài nguyên một cách an toàn trong môi trường mạng tách biệt.
 
-VPC giúp bạn kiểm soát hoàn toàn môi trường mạng của mình, từ cấu hình địa chỉ IP, bảng định tuyến (route table), cổng internet (Internet Gateway) cho đến các mạng con (subnet).
+VPC cho phép:
 
-#### Các trường hợp sử dụng chính của VPC trong Workshop
+- Kiểm soát địa chỉ IP, bảng định tuyến (Route Table), Internet Gateway và mạng con (Subnet).
 
-- Lưu trữ và chạy các ứng dụng trên **EC2**: Cung cấp một môi trường an toàn để triển khai các máy chủ ảo (instances).
+- Cấu hình bảo mật và quyền truy cập giữa các dịch vụ trong AWS.
 
-- Tương tác với **cơ sở dữ liệu RDS**: Tạo một subnet private để bảo vệ cơ sở dữ liệu khỏi truy cập từ internet, chỉ cho phép kết nối từ các dịch vụ trong VPC.
+- Bảo vệ cơ sở dữ liệu Amazon DocumentDB bằng cách đặt trong Private Subnet, tránh truy cập từ Internet.
 
-- Sử dụng **S3** thông qua Gateway: Đảm bảo truyền dữ liệu an toàn giữa S3 và các dịch vụ trong VPC thông qua S3 Gateway mà không cần tiếp xúc với internet công khai.
+#### Mô hình triển khai VPC trong Workshop
 
-![use-case-vpc](/images/3-create-vpc-instance/3.1-create-vpc/use-case-vpc.png)
+Trong Workshop này, chúng ta sẽ khởi tạo VPC Instance bao gồm:
+
+- 2 Availability Zones (AZs) để đảm bảo tính sẵn sàng cao.
+
+- 2 Public Subnets (dành cho EC2 chạy ứng dụng).
+
+- 2 Private Subnets (dành cho Amazon DocumentDB).
+
+- Internet Gateway (IGW) để EC2 có thể giao tiếp với Internet.
+
+- Security Group để quản lý quyền truy cập an toàn.
+  ![use-case-vpc](/images/3-create-vpc-instance/3.1-create-vpc/use-case-vpc.png)
 
 #### Chi phí cho VPC
 
@@ -32,24 +43,27 @@ Sẽ không phát sinh chi phí khi sử dụng VPC. Tuy nhiên, sẽ có phí d
 
 #### 1. Tạo VPC Instance
 
-- Truy cập [Your VPCs](https://ap-southeast-1.console.aws.amazon.com/vpcconsole/home?region=ap-southeast-1#vpcs:), Create VPC
+- Truy cập [Your VPCs](https://ap-southeast-1.console.aws.amazon.com/vpcconsole/home?region=ap-southeast-1#vpcs:)
+- Chọn **Create VPC**
+  ![access-vpc](/images/3-create-vpc-instance/3.1-create-vpc/3.1.png)
+
 - Tại **VPC Settings**, chọn option **VPC and more**
 
-![create-vpc](/images/3-create-vpc-instance/3.1-create-vpc/create-vpc.png)
+![create-vpc](/images/3-create-vpc-instance/3.1-create-vpc/3.2.png)
 
 - Đặt tên **name tag** và để mặc định các field khác, chọn **Create VPC**
-  ![create-vpc-done](/images/3-create-vpc-instance/3.1-create-vpc/create-vpc-done.png)
-- Kết quả tạo VPC Instance thành công
-  ![review-result](/images/3-create-vpc-instance/3.1-create-vpc/review-result.png)
+  ![create-vpc-done](/images/3-create-vpc-instance/3.1-create-vpc/3.3.png)
+- Chọn **View VPC** để xem chi tiết VPC đã tạo
+  ![review-result](/images/3-create-vpc-instance/3.1-create-vpc/3.4.png)
 
 #### 2. Tiếp theo chúng ta sẽ gán Public IP4 cho các public subnet
 
 - Truy cập [Subnets](https://ap-southeast-1.console.aws.amazon.com/vpcconsole/home?region=ap-southeast-1#subnets:)
-- Chọn **Subnet ID** của public subnet e.g. **deploy-golang-workshop-subnet-public1-ap-southeast-1a**
-  ![subnets](/images/3-create-vpc-instance/3.1-create-vpc/subnets.png)
+- Chọn **Subnet ID** của public subnet e.g. **deploy-nextjs-workshop-subnet-public1-ap-southeast-1a**
+  ![subnets](/images/3-create-vpc-instance/3.1-create-vpc/3.5.png)
 - Chọn dropdown **Actions**, **Edit subnet settings**
-  ![edit-subnet](/images/3-create-vpc-instance/3.1-create-vpc/edit-subnet.png)
-- Tích vào **Enable auto-assign public IPv4 address**, Save
-  ![enable-ipv4](/images/3-create-vpc-instance/3.1-create-vpc/enable-ipv4.png)
-- Hoàn thành gán Public IPv4 cho một public subnet **deploy-golang-workshop-subnet-public1-ap-southeast-1a**
-  ![complete](/images/3-create-vpc-instance/3.1-create-vpc/complete.png)
+  ![edit-subnet](/images/3-create-vpc-instance/3.1-create-vpc/3.6.png)
+- Tích vào **Enable auto-assign public IPv4 address**, **Save**
+  ![enable-ipv4](/images/3-create-vpc-instance/3.1-create-vpc/3.7.png)
+- Hoàn thành gán Public IPv4 cho một public subnet **deploy-nextjs-workshop-subnet-public1-ap-southeast-1a**
+  ![complete](/images/3-create-vpc-instance/3.1-create-vpc/3.8.png)

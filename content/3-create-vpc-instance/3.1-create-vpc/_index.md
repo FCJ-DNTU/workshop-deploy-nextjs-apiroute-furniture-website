@@ -8,23 +8,36 @@ pre: "<b>3.1. </b>"
 
 #### Introduction to VPC
 
-In this workshop, _Amazon Virtual Private Cloud (VPC)_ is used to create a **private network**, enabling the organization and management of resources within a dedicated network space on AWS.
+In this workshop, **Amazon Virtual Private Cloud (VPC)** will be used to create a private network. This helps organize
+and manage resources securely in an isolated network environment.
 
-VPC allows you to have complete control over your network environment, including IP address configuration, route tables, internet gateways, and subnets.
+VPC allows:
 
-#### Key Use Cases of VPC in the Workshop
+- Controlling IP addresses, route tables, Internet Gateway, and subnets.
 
-- **Hosting and running applications on EC2:** Provides a secure environment for deploying virtual servers (instances).
+- Configuring security and access control between AWS services.
 
-- **Interacting with RDS databases:** Creates a private subnet to protect the database from internet access, allowing connections only from services within the VPC.
+- Protecting Amazon DocumentDB by placing it in a Private Subnet, preventing access from the Internet.
 
-- **Using S3 via Gateway:** Ensures secure data transmission between S3 and services in the VPC through an S3 Gateway without exposing it to the public internet.
+#### VPC Deployment Model in This Workshop
 
-![use-case-vpc](/images/3-create-vpc-instance/3.1-create-vpc/use-case-vpc.png)
+In this workshop, we will initialize a VPC Instance that includes:
+
+- 2 Availability Zones (AZs) to ensure high availability.
+
+- 2 Public Subnets (for EC2 running applications).
+
+- 2 Private Subnets (for Amazon DocumentDB).
+
+- An Internet Gateway (IGW) to allow EC2 instances to communicate with the Internet.
+
+- Security Groups to manage secure access control.
+
+  ![use-case-vpc](/images/3-create-vpc-instance/3.1-create-vpc/use-case-vpc.png)
 
 #### Pricing for VPC
 
-There's no additional charge for using a VPC. However, charges for some **VPC components**, such as NAT gateways, IP Address Manager, traffic mirroring, Reachability Analyzer, and Network Access Analyzer.
+There is no cost associated with using VPC itself. However, charges apply for **VPC-related services**, such as NAT Gateways, IP Address Manager, traffic mirroring, Reachability Analyzer, and Network Access Analyzer.
 
 #### Create a VPC Instance
 
@@ -32,24 +45,26 @@ In this section, we will create a **VPC Instance**, which includes 2 **Availabil
 
 #### 1. Create the VPC Instance
 
-- Go to [Your VPCs](https://ap-southeast-1.console.aws.amazon.com/vpcconsole/home?region=ap-southeast-1#vpcs:), and select **Create VPC**.
+- Go to [Your VPCs](https://ap-southeast-1.console.aws.amazon.com/vpcconsole/home?region=ap-southeast-1#vpcs:), and
+- Select **Create VPC**.
+  ![access-vpc](/images/3-create-vpc-instance/3.1-create-vpc/3.1.png)
 - In the **VPC Settings**, choose the option **VPC and more**.
 
-![create-vpc](/images/3-create-vpc-instance/3.1-create-vpc/create-vpc.png)
+  ![create-vpc](/images/3-create-vpc-instance/3.1-create-vpc/3.2.png)
 
-- Add a **name tag** and keep the default values for other fields, then click **Create VPC**.
-  ![create-vpc-done](/images/3-create-vpc-instance/3.1-create-vpc/create-vpc-done.png)
-- The VPC Instance is successfully created.
-  ![review-result](/images/3-create-vpc-instance/3.1-create-vpc/review-result.png)
+- Enter a **name tag** and leave other fields as default, then click **Create VPC**.
+  ![create-vpc-done](/images/3-create-vpc-instance/3.1-create-vpc/3.3.png)
+- Click View VPC to see the details of the created VPC
+  ![review-result](/images/3-create-vpc-instance/3.1-create-vpc/3.4.png)
 
 #### 2. Assign Public IPv4 to Public Subnets
 
 - Go to [Subnets](https://ap-southeast-1.console.aws.amazon.com/vpcconsole/home?region=ap-southeast-1#subnets:).
-- Select the **Subnet ID** of the public subnet, e.g., **deploy-golang-workshop-subnet-public1-ap-southeast-1a**.
-  ![subnets](/images/3-create-vpc-instance/3.1-create-vpc/subnets.png)
-- From the dropdown **Actions**, choose **Edit subnet settings**.
-  ![edit-subnet](/images/3-create-vpc-instance/3.1-create-vpc/edit-subnet.png)
-- Check the option **Enable auto-assign public IPv4 address**, and click Save.
-  ![enable-ipv4](/images/3-create-vpc-instance/3.1-create-vpc/enable-ipv4.png)
-- Successfully assigned a Public IPv4 address to the public subnet **deploy-golang-workshop-subnet-public1-ap-southeast-1a**.
-  ![complete](/images/3-create-vpc-instance/3.1-create-vpc/complete.png)
+- Select the **Subnet ID** of the public subnet, e.g., **deploy-nextjs-workshop-subnet-public1-ap-southeast-1a**.
+  ![subnets](/images/3-create-vpc-instance/3.1-create-vpc/3.5.png)
+- Click the **Actions** dropdown, then select **Edit subnet settings**
+  ![edit-subnet](/images/3-create-vpc-instance/3.1-create-vpc/3.6.png)
+- Check **Enable auto-assign public IPv4 address**, then **Save**
+  ![enable-ipv4](/images/3-create-vpc-instance/3.1-create-vpc/3.7.png)
+- Successfully assigned a Public IPv4 to the public subnet **deploy-nextjs-workshop-subnet-public1-ap-southeast-1a**
+  ![complete](/images/3-create-vpc-instance/3.1-create-vpc/3.8.png)
