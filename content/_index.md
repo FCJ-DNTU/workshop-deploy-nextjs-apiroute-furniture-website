@@ -1,5 +1,5 @@
 +++
-title = "Setting up an AWS account"
+title = "Deploying Next.js 14 Fullstack on AWS EC2"
 date = 2025
 weight = 1
 chapter = false

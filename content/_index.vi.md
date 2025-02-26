@@ -1,5 +1,5 @@
 +++
-title = "Workshop Triển Khai Next.js 14 Fullstack Trên AWS EC2 Với CloudFront & DocumentDB"
+title = "Triển Khai Next.js 14 Fullstack Trên AWS EC2"
 date = 2025
 weight = 1
 chapter = false
