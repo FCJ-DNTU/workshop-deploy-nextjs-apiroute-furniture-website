@@ -118,58 +118,15 @@ console..
 - Xem Public IPv4 tại **EC2 Instance** > **Networking** > **Public IPv4 Address**.
 ![review.png](/images/4-create-ec2-instance/4.8.png)
 
-#### 9. Kiểm tra kết nối tới EC2 Instance
-
-#### 9.1. Kết nối EC2 Instance bằng SSH
+#### 9. Kết nối bằng EC2 Instance
 
 - Chọn EC2 Instance vừa khởi tạo, chọn **Connect**
 ![connect.png](/images/4-create-ec2-instance/4.9.png)
-- Tại giao diện **Connect to instance**, chọn tab **SSH Client**
-![ssh-client.png](/images/4-create-ec2-instance/4.10.png)
+- Tại giao diện **Connect to instance**, chọn tab **EC2 Instance Connect** và chọn **Connect**
+![ssh-client.png](/images/4-create-ec2-instance/connect-ec2.png)
 
-- Nếu bạn đang sử dụng **MacOS**, copy example ssh command line và paste vào **Terminal**, câu lệnh có cú pháp:
-
-```
-$ chmod 400 "nextjs-kp.pem"
-$ ssh -i path/to/key-pair.pem ubuntu@domain
-```
-
-- Nếu bạn đang sử dụng **Windows**, hãy cài đặt [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) để thực
-hiện các câu lệnh Linux hoặc có thể Tải các công cụ PuTTY: [PuTTY Executable
-(putty.exe)](https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe), [Tải SCP Client
-(pscp.exe)](https://the.earth.li/~sgtatham/putty/latest/w64/pscp.exe), [Tải RSA và DSA Key Generation Utility
-(puttygen.exe)](https://the.earth.li/~sgtatham/putty/latest/w64/puttygen.exe)
-- Lưu các file này vào cùng thư mục nơi bạn đã tải về cặp key của EC2.
-
-- Ở trong workshop này, chúng ta sẽ kết nối EC2 bằng Putty:
-- Mở **puttygen.exe** và load file private key.
-- Chọn **Load**.
-- Chọn file **nextjs-kp.pem** làm private key cho instance.
-![connect1.png](/images/4-create-ec2-instance/4.11.png)
-- Sau khi import key thành công, lưu **private key** đã được chuyển đổi
-![connect2.png](/images/4-create-ec2-instance/4.12.png)
-- Đặt tên file là **nextjs-kp.ppk** và chọn **Save**.
-![connect3.png](/images/4-create-ec2-instance/4.13.png)
-- Quay lại giao diện EC2, chọn instance Linux và sao chép địa chỉ Public IPv4.
-![ipv4.png](/images/4-create-ec2-instance/4.14.png)
-- Kết nối EC2 bằng PuTTY:
-- Mở **putty.exe**.
-- Nhập Public IPv4 Address vào phần Host Name (or IP address).
-- Lưu phiên với tên Ubuntu, chọn Save.
-![ipv4.png](/images/4-create-ec2-instance/4.15.png)
-- Cấu hình SSH để kết nối:
-- Chọn SSH > Auth.
-- Nhấn Browse, chọn tệp **nextjs-kp.ppk**.
-- Nhấn **Open** để kết nối.
-- Khi có thông báo xác nhận, chọn **Accept** để tiếp tục.
-![ipv4.png](/images/4-create-ec2-instance/4.16.png)
-![ipv4.png](/images/4-create-ec2-instance/4.17.png)
-- Sau đó đăng nhập bằng tên: `ubuntu`
-![login.png](/images/4-create-ec2-instance/4.18.png)
-
-#### 9.2. Truy cập thành công
-
-![complete.png](/images/4-create-ec2-instance/4.19.png)
+- Kết nối thành công
+![success.png](/images/4-create-ec2-instance/connect-successfully.png)
 
 {{< center>}}
 

@@ -6,100 +6,103 @@ chapter: false
 pre: "<b>5. </b>"
 ---
 
-#### AWS Relational Database Service
+![aws-documentdb.png](/images/5-create-documentdb-instance/aws-documentdb.png)
 
-**Amazon Relational Database Service (Amazon RDS)** is a web service that makes it easier to set up, operate, and scale
-a relational database in the AWS Cloud.
+#### AWS DocumentDB
 
-#### Create a DB Instance on AWS
+**Amazon DocumentDB** (with MongoDB compatibility) is a **fully managed native JSON document database** that simplifies running critical document workloads at virtually any scale without the need to manage infrastructure, making it cost-effective and easy to use.
 
-{{% notice info %}}
-Note: The procedure below assumes that **Standard create** is enabled and **Easy create** is not. This procedure uses
-MySQL as an example.
-{{% /notice %}}
+#### Benefits of Using DocumentDB:
 
-#### Steps to create a DB Instance:
+- **MongoDB Compatibility:** Supports popular MongoDB APIs, allowing easy migration from MongoDB.
 
-1. Log in to the **AWS Management Console** and open the Amazon RDS console at [RDS
-Console](https://console.aws.amazon.com/rds/).
+- **High Performance & Scalable:** Distributed storage architecture enhances read/write speed and automatically scales as needed.
 
-2. In the top-right corner of the **Amazon RDS** console, select the AWS region where you want to create the DB
-Instance.
+- **Easy Management:** As a **fully managed** service, it reduces database administration overhead.
 
-3. In the navigation pane, select **Databases**.
+#### 💰 Pricing of Amazon DocumentDB
 
-4. Click **Create database**, then choose **Standard create**.
+The cost of **Amazon DocumentDB** depends on the following factors:
 
-![rds-interface.png](/images/5-create-rds-instance/rds-interface.png)
+- **On-Demand Instances** – Charged per hour based on instance type.
 
-5. For **Engine type**, select MariaDB, Microsoft SQL Server, MySQL, Oracle, or PostgreSQL. In this example, we use
-**MySQL**.
+- **Database I/O** – Charged per million read/write operations.
 
-6. For **Edition**, select **MySQL Community**.
+- **Database Storage** – Charged per GB per month.
 
-7. For **Version**, select the engine version (e.g., MySQL 8.0.39).
-![create-db.png](/images/5-create-rds-instance/create-db.png)
+- **Backup Storage** – Charged per GB per month beyond database storage.
 
-8. Under **Templates**, choose the **Free tiers** template.
+AWS provides **two pricing options**:
 
-9. To set the master password, follow these steps:
+- **Amazon DocumentDB Standard (Pay-as-you-go I/O)**
 
-- In the **Settings** section, open **Credential Settings**.
-- If **Auto generate a password** is checked, uncheck it if you want to specify a password.
-- (Optional) Change the **Master username** value.
-- Enter the same password in **Master password** and **Confirm password**.
-- (Optional) Set up connection with a compute resource for the DB Instance.
+  - Suitable for workloads with low to medium I/O.
+  - Charges include four factors: Instance, Database I/O, Storage, and Backup.
+  - If I/O costs are less than 25% of the total cost, this is a suitable option.
 
-![settings.png](/images/5-create-rds-instance/settings.png)
+- **Amazon DocumentDB I/O-Optimized (Includes I/O costs in instance pricing)**
 
-10. You can configure the connection between an Amazon EC2 instance and the new DB Instance during the creation process.
+  - Ideal for high I/O applications requiring predictable costs.
+  - Charges only three factors: Instance, Storage, and Backup.
+  - No separate I/O charges, making cost estimation easier.
+  - If I/O costs exceed 25% of the total, this is the recommended choice.
 
-- Under **Connectivity**, choose **Connect to EC2 Compute Resource**.
-- Select the **EC2 Instance** you created earlier.
+#### Which Configuration to Choose for This Workshop?
 
-11. Configure **DB Subnet Group**:
+- We will choose **Amazon DocumentDB Standard**
+  to optimize costs because:
 
-- In the **DB Subnet Group** section, choose **Choose Existing** and select **golang-db-subnet-group**.
+  - Initial query volume is low.
+  - Pay only for actual I/O usage.
+  - Flexible upgrade to I/O-Optimized when queries increase.
 
-12. Configure **VPC Security Group**:
+#### Creating a DB Instance on AWS
 
-- Select **Choose Existing**, and from the dropdown, select **private-sg**, the security group you created earlier.
+1. Log in to the **AWS Management Console** and open **Amazon DocumentDB**
 
-![connectivity.png](/images/5-create-rds-instance/connectivity.png)
+2. Create a **DocumentDB Cluster**
+   ![Cluster-interface.png](/images/5-create-documentdb-instance/5.1.png)
 
-13. Click **Create database**.
+3. In **Create Amazon DocumentDB cluster**, enter the following details:
 
-14. Verify the RDS Instance:
+   - **Cluster type**: Instance-based cluster
+   - **Cluster identifier**: `docdb-nextjs-workshop`
+   - **Engine version**: Select the latest version
+   - **Cluster storage configuration**: Amazon DocumentDB Standard
+   - **Instance class**: db.t3.medium
+   - **Number of instances**: 2 (1 Primary + 1 Replica)
+   - **Connectivity**: Connect to an EC2 compute resource
+   - **EC2 Instance**: Select the created EC2 instance
+   - **Username**: `user123`
+   - **Password**: `user1234`
+   - **Subnet group**: Select the subnet group created in **3.3**
+   - **VPC security groups**: **private-sg-documentdb (VPC)**
+   - **Deletion protection**: Uncheck **Enable deletion protection**
+   - Review the settings and click **Create cluster**
+     ![create-1.png](/images/5-create-documentdb-instance/5.2.png)
+     ![create-2.png](/images/5-create-documentdb-instance/5.3.png)
+     ![create-3.png](/images/5-create-documentdb-instance/5.4.png)
+     ![create-4.png](/images/5-create-documentdb-instance/5.5.png)
+     ![create-5.png](/images/5-create-documentdb-instance/5.6.png)
+     ![create-6.png](/images/5-create-documentdb-instance/5.7.png)
+   - Cluster successfully created
+     ![create-success.png](/images/5-create-documentdb-instance/5.8.png)
 
-- In the RDS instance details page, you can find information like **Endpoint**, **Port**, and **Username**.
-- The **Endpoint** is the URL or IP address you use to connect to the RDS database.
+4. Verify Connection from EC2 to DocumentDB
 
-![rds.png](/images/5-create-rds-instance/rds.png)
+- Open the newly created cluster, go to the **Configuration** tab, and copy the **Cluster endpoint**
+  ![copy-cluster.png](/images/5-create-documentdb-instance/5.9.png)
+- In EC2, click **Connect** and then click **Connect** under the **EC2 Instance Connect** tab.
 
-15. Verify MySQL connection from EC2:
+  ```shell
+  $ sudo apt-get install -y netcat
+  $ nc -zv docdb-nextjs-workshop.cluster-c10k88ou8amc.ap-southeast-1.docdb.amazonaws.com 27017
+  ```
 
-```shell
-$ sudo yum install mysql
-$ mysql -h <endpoint> -P 3306 -u admin -p <password>
-            # $ mysql -h mysql-golang-db.c1a20mqwgeb9.ap-southeast-1.rds.amazonaws.com -P 3306 -u admin -pAdmin123
-            ```
+  ![success.png](/images/5-create-documentdb-instance/5.10.png)
 
-            ![ec2-to-mysql.png](/images/5-create-rds-instance/ec2-to-mysql.png)
+{{< center>}}
 
-            16. Create a Database:
-            {{% notice tip %}}
-            The admin user cannot directly access the **mysql** database. It is recommended to create a new database for
-            access. This issue is due to RDS privileges.
-            {{% /notice %}} > Since RDS is a managed service, to maintain system integrity and stability, superuser
-            privileges
-            are not granted to even the master user of the DB instance. Therefore, errors like this are expected, as the
-            RDS
-            MySQL master user by default does not have ADMIN, ROLE_ADMIN, or SUPER privileges.
+### **Completed! 🚀**
 
-            ```mysql
-            CREATE DATABASE blog_db;
-            # Query OK, 1 row affected (0.01 sec)
-            ```
-
-            17. Access the Database:
-            ![db.png](/images/5-create-rds-instance/db.png)
+{{< /center>}}

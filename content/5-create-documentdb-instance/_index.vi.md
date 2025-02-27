@@ -6,97 +6,93 @@ chapter: false
 pre: "<b>5. </b>"
 ---
 
-#### AWS Relational Database Service
+![aws-documentdb.png](/images/5-create-documentdb-instance/aws-documentdb.png)
 
-**Amazon Relational Database Service (Amazon RDS)** là một dịch vụ web giúp dễ dàng thiết lập, vận hành và mở rộng cơ sở
-dữ liệu quan hệ trong môi trường đám mây AWS.
+#### AWS DocumentDB
+
+**Amazon DocumentDB** (với khả năng tương thích MongoDB) là **cơ sở dữ liệu tài liệu JSON gốc** được quản lý đầy đủ, giúp vận hành khối lượng công việc tài liệu quan trọng ở hầu hết mọi quy mô mà không cần quản lý cơ sở hạ tầng một cách dễ dàng và tiết kiệm chi phí.
+
+#### Lợi ích khi sử dụng DocumentDB:
+
+- **Tương thích với MongoDB:** Hỗ trợ các API MongoDB phổ biến, dễ dàng di chuyển dữ liệu từ MongoDB.
+- **Hiệu suất cao & Mở rộng linh hoạt:** Kiến trúc lưu trữ phân tán giúp tăng tốc độ đọc/ghi và tự động mở rộng khi cần thiết.
+- **Quản lý dễ dàng:** Là dịch vụ **fully managed**, giúp giảm tải quản trị cơ sở dữ liệu.
+
+#### 💰 Giá của Amazon DocumentDB
+
+Giá của **Amazon DocumentDB** phụ thuộc vào các yếu tố sau:
+
+- **On-Demand Instances** – Tính theo giờ sử dụng của từng loại instance.
+- **Database I/O** – Tính theo số lần đọc/ghi dữ liệu (theo triệu I/Os).
+- **Database Storage** – Tính theo dung lượng lưu trữ (GB/tháng).
+- **Backup Storage** – Tính theo dung lượng backup vượt mức database storage (GB/tháng).
+
+AWS cung cấp **hai tùy chọn** cấu hình giá:
+
+- **Amazon DocumentDB Standard (Trả tiền theo I/O sử dụng)**
+  - Phù hợp với workload có I/O thấp đến trung bình.
+  - Tính phí dựa trên cả 4 yếu tố: Instance, Database I/O, Storage, và Backup.
+  - Nếu chi phí I/O thấp hơn 25% tổng chi phí, đây là lựa chọn phù hợp.
+- **Amazon DocumentDB I/O-Optimized (Đã bao gồm phí I/O trong giá thuê instance)**
+  - Phù hợp với ứng dụng có I/O cao, cần tính toán chi phí ổn định.
+  - Chỉ tính phí trên 3 yếu tố: Instance, Storage, và Backup.
+  - Không tính phí I/O riêng biệt, giúp dự đoán chi phí dễ dàng hơn.
+  - Nếu chi phí I/O chiếm trên 25% tổng chi phí, đây là lựa chọn phù hợp.
+
+#### Workshop này nên chọn cấu hình nào?
+
+- Chúng ta sẽ chọn **Amazon DocumentDB Standard** để tiết kiệm chi phí, vì:
+  - Khối lượng truy vấn ban đầu thấp.
+  - Chỉ trả tiền cho I/O thực tế sử dụng.
+  - Linh hoạt nâng cấp lên I/O-Optimized khi hệ thống có nhiều truy vấn hơn.
 
 #### Tạo một DB Instance trên AWS
 
-{{% notice info %}}
-Lưu ý: Trong thủ tục dưới đây, tùy chọn Standard create được bật và Easy create không được bật. Thủ tục này sử dụng
-MySQL làm ví dụ.
-{{% /notice %}}
+1. Đăng nhập vào **AWS Management Console** và mở **Amazon DocumentDB**
 
-#### Để tạo một DB Instance:
+2. Tạo **DocumentDB Cluster**
+   ![Cluster-interface.png](/images/5-create-documentdb-instance/5.1.png)
 
-1. Đăng nhập vào **AWS Management Console** và mở Amazon RDS console tại https://console.aws.amazon.com/rds/.
+3. Trong **Create Amazon DocumentDB cluster**, điền thông tin sau:
 
-2. Ở góc trên bên phải của **Amazon RDS** console, chọn khu vực AWS mà bạn muốn tạo DB Instance.
+   - **Cluster type**: Instance-based cluster
+   - **Cluster identifier**: `docdb-nextjs-workshop`
+   - **Engine version**: Chọn phiên bản mới nhất
+   - **Cluster storage configuration**: Amazon DocumentDB Standard
+   - **Instance class**: db.t3.medium
+   - **Number of instances**: 2 (1 Primary + 1 Replica)
+   - **Connectivity**: Connect to an EC2 compute resource
+   - **EC2 Instance**: Chọn EC2 đã tạo
+   - **Username**: `user123`
+   - **Password**: `user1234`
+   - **Subnet group**: chọn subnet group đã tạo ở **3.3**
+   - **VPC security groups**: **private-sg-documentdb (VPC)**
+   - **Deletion protection**: bỏ tích **Enable deletion protection**
+   - Kiểm tra lại các thiết lập và nhấn **Create cluster**
+     ![create-1.png](/images/5-create-documentdb-instance/5.2.png)
+     ![create-2.png](/images/5-create-documentdb-instance/5.3.png)
+     ![create-3.png](/images/5-create-documentdb-instance/5.4.png)
+     ![create-4.png](/images/5-create-documentdb-instance/5.5.png)
+     ![create-5.png](/images/5-create-documentdb-instance/5.6.png)
+     ![create-6.png](/images/5-create-documentdb-instance/5.7.png)
+   - Tạo **Cluster** thành công
+     ![create-success.png](/images/5-create-documentdb-instance/5.8.png)
 
-3. Trong khung điều hướng, chọn **Databases**.
+4. Kiểm tra kết nối từ EC2 tới DocumentDB
 
-4. Chọn **Create database**, sau đó chọn **Standard create**.
+- Vào cluster vừa mới tạo, chọn tab **Configuration** và copy **Cluster endpoint**
+  ![copy-cluster.png](/images/5-create-documentdb-instance/5.9.png)
+- Vào EC2, ấn nút **Connect** và ấn nút **Connect** trong tab **EC2 Instance Connect**
 
-![rds-interface.png](/images/5-create-rds-instance/rds-interface.png)
+  ```shell
+  $ sudo apt-get install -y netcat
+  $ nc -zv docdb-nextjs-workshop.cluster-c10k88ou8amc.ap-southeast-1.docdb.amazonaws.com 27017
+  ```
 
-5. Đối với **Engine type**, chọn MariaDB, Microsoft SQL Server, MySQL, Oracle, hoặc PostgreSQL. Trong ví dụ này, chúng
-ta sử dụng **MySQL**.
+  ![success.png](/images/5-create-documentdb-instance/5.10.png)
 
-6. Đối với **Edition**, chọn **MySQL Community**
+{{< center>}}
 
-7. Đối với Version, chọn phiên bản của engine. e.g. MySQL 8.0.39
-![create-db.png](/images/5-create-rds-instance/create-db.png)
+### **Hoàn thành! 🚀**
 
-8. Trong phần Templates, chọn **Free tiers** template:
-
-9. Để nhập mật khẩu chính của bạn, làm theo các bước sau:
-
-- Trong phần Settings, mở Credential Settings.
-- Nếu bạn muốn chỉ định một mật khẩu, hãy bỏ chọn hộp kiểm Auto generate a password nếu nó đã được chọn.
-- (Tùy chọn) Thay đổi giá trị Master username.
-- Nhập cùng mật khẩu trong Master password và Confirm password.
-- (Tùy chọn) Cài đặt kết nối với một tài nguyên tính toán cho DB Instance này.
-
-![settings.png](/images/5-create-rds-instance/settings.png)
-
-10. Bạn có thể cấu hình kết nối giữa một Amazon EC2 instance và DB Instance mới trong quá trình tạo DB Instance.
-
-- Trong phần Connectivity, chọn **Connect to EC2 Compute Resource**
-- Chọn **EC2 Instance** chúng ta vừa tạo
-
-11. Cấu hình **DB Subnet Group**
-
-- Tại phần **DB Subnet Group**, chọn **Choose Existing** chọn **golang-db-subnet-group**
-
-12. Cấu hình **VPC Security Group**
-
-- Chọn **Choose Existing**, tại dropdown chọn **private-sg**, security group chúng ta vừa khởi tạo
-
-![connectivity.png](/images/5-create-rds-instance/connectivity.png)
-
-13. Chọn Create database.
-
-14. Kiểm tra RDS
-
-- Trong trang chi tiết của instance RDS, bạn có thể tìm thấy các thông tin liên quan đến kết nối như Endpoint (điểm kết
-nối), Port (cổng), và Username (tên người dùng).
-- Điểm kết nối (Endpoint) là URL hoặc địa chỉ IP mà bạn sử dụng để kết nối tới cơ sở dữ liệu RDS.
-
-![rds.png](/images/5-create-rds-instance/rds.png)
-
-15. Kiểm tra kết nối từ EC2 tới MySQL
-
-```shell
-$ sudo yum install mysql
-$ mysql -h <endpoint> -P 3306 -u admin -p <password>
-            # $ mysql -h mysql-golang-db.c1a20mqwgeb9.ap-southeast-1.rds.amazonaws.com -P 3306 -u admin -pAdmin123
-            ```
-
-            ![ec2-to-mysql.png](/images/5-create-rds-instance/ec2-to-mysql.png)
-
-            16. Tạo Database
-            {{% notice tip %}}
-            Admin user không thể truy cập trực tiếp với database **mysql**, chúng ta nên tạo database mới để truy cập.
-            Mình đã troubleshoot lỗi này trong một buổi, và đơn giản là do privileges bên trong RDS :D
-            {{% /notice %}} >Since RDS is a managed service, to maintain the system integrity and stability, super user
-            privileges are not provided even to the master user of the DB instance, and therefore, such error message is
-            expected, as the RDS MySQL master user by default does not have the ADMIN, ROLE_ADMIN, SUPER privileges.
-
-            ```mysql
-            CREATE DATABASE blog_db;
-            # Query OK, 1 row affected (0.01 sec)
-            ```
-
-            17. Truy cập vào Database
-            ![db.png](/images/5-create-rds-instance/db.png)
+{{< /center>}}
