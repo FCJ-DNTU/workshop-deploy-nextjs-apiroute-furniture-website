@@ -8,100 +8,159 @@ pre: "<b>4. </b>"
 
 #### Amazon EC2
 
-**Amazon Elastic Compute Cloud (Amazon EC2)** provides on-demand, scalable computing capacity in the Amazon Web Services (AWS) Cloud.
+**Amazon Elastic Compute Cloud (Amazon EC2)** is a cloud computing infrastructure provided by Amazon Web Services (AWS) that offers on-demand virtual computing resources.
 
-![ec2](https://docs.aws.amazon.com/images/AWSEC2/latest/UserGuide/images/instance-types.png)
+#### Amazon EC2 Instance
 
-#### Main Use Case of EC2 in the Workshop
+An **Amazon EC2 Instance** is a cloud server. With an AWS account, you can create and use multiple Amazon EC2 Instances. These instances run on the same physical server and share memory, CPU, storage, etc.
 
-In this workshop, **Amazon EC2** is used to deploy a simple Golang application. To optimize costs and resources, we are using the **t2.micro** instance type. This instance type is ideal for small-scale applications or development environments, providing basic resources at a low cost.
+#### EC2 Deployment Model in the Workshop
 
-### Why choose **t2.micro**:
+In this workshop, we will initialize an EC2 Instance to run a Next.js Fullstack application with API Routes. EC2 will act as an Application Server handling both the Frontend and Backend.
 
-- **Low Cost:** This instance type falls under the Free Tier (free within AWS Free Tier limits), making it suitable for learning or experimentation.
-- **Basic Resources:** Offers 1 vCPU and 1GB of RAM, sufficient to run a simple Golang application or test basic AWS services.
-- **Burstable Performance:** Provides the ability to boost performance when needed, useful for applications with variable workloads.
+### Why choose **t2.medium**:
 
----
+- **Balanced performance and cost:**
+  - t2.medium provides 2 vCPUs and 4GB RAM, sufficient to run a Next.js Fullstack application (including API Routes).
+  - t2.medium provides 2 vCPUs and 4GB RAM, sufficient to run a Next.js Fullstack application (including API Routes).
+- **Supports Burstable Performance:** T2 instances are Burstable Performance Instances, meaning they can increase CPU performance when needed.
+- **Scalability:** If expansion is needed, switching to t3.medium or m5.large is easy without changing the architecture.
 
-#### Create an EC2 Instance on AWS
+**In this workshop, we will choose the t2.medium instance on an On-Demand basis in the ap-southeast-1 (Singapore) region**
+| On-Demand hourly rate | vCPU | Memory |
+| ----------------------- | -----| -------|
+| $0.0584 | 2 | 4 GiB |
 
-You can create a Linux instance using the AWS Management Console by following the instructions below.
-This guide is designed to help you quickly create your first instance, so it doesn't cover all possible options.
+**Why Choose On-Demand Instances:** Pay per use without long-term commitments.
 
-For detailed information on advanced options, check the guide on creating an instance using the Launch Instance wizard. For other ways to create your instance, refer to the guide on creating an instance.
+**Estimated Cost Using On-Demand:**
 
-#### 1. Access AWS Console
+- t2.medium (2 vCPUs, 4GB RAM): **$0.0584/hour**
+- If running 24/7 (730 hours/month): **~$42.63/month**
 
-- Open your browser and go to the Amazon EC2 console at [EC2 Console](https://console.aws.amazon.com/ec2/).
+**👉 Cost Optimization:** Only turn on EC2 when needed, turn it off when not in use.
 
-#### 2. Select Launch Instance
+#### Create an EC2 Instance
 
-- In the EC2 dashboard, click **Launch Instance** in the Launch instance box.
+####1. Access AWS Console
 
-#### 3. Name Your Instance
+- Open a browser and go to the Amazon EC2 console at https://console.aws.amazon.com/ec2/.
 
-- Under **Name and tags**, enter a descriptive name for your instance.
+#### 2. In the **Dashboard**, select **Launch instance**
 
-#### 4. Choose an Image (Amazon Machine Image - AMI)
+![Launch.png](/images/4-create-ec2-instance/4.1.png)
 
-- Under **Application and OS Images (Amazon Machine Image)**, follow these steps:
-  - Select **Quick Start**, then choose **Amazon Linux**. This will be the operating system (OS) for your instance.
-  - From the Amazon Machine Image (AMI), select a **HVM version of Amazon Linux 2023**. These AMIs are labeled **Free tier eligible**. An AMI is a basic configuration used as a template for your instance.
-    ![ami.png](/images/4-create-ec2-instance/ami.png)
+#### 3. Name the Instance
 
-#### 5. Choose Instance Type
+- In the **Name and tags** section:
 
-- Under **Instance type**, from the list, select the hardware configuration for your instance. Choose **t2.micro**, which is selected by default. The **t2.micro** instance type is eligible for AWS Free Tier. If **t2.micro** is unavailable in your region, you can use **t3.micro**, which is also eligible for AWS Free Tier. For more information, see AWS Free Tier.
+  - **Name:** `nextjs-ec2`
 
-#### 6. Select Key Pair
+#### 4. Select an Image (Amazon Machine Image - AMI)
 
-- Under **Key pair (login)**, choose a **key pair name**. Select the key pair you created during setup.
+- Under Application and OS Images (Amazon Machine Image), follow these steps:
+
+  - Select **Quick Start**, then choose **Ubuntu**. This is the operating system (OS) for your instance.
+
+  - From Amazon Machine Image (AMI), select **Ubuntu 24.04 LTS HVM**. Note that this AMI is marked as **Free tier eligible**. An Amazon Machine Image (AMI) is a base configuration used as a template for your instance.
+    ![ami.png](/images/4-create-ec2-instance/4.2.png)
+
+#### 5. Choose an Instance Type
+
+- In Instance type, select **t2.medium**, then under **Key pair (login)**, select **Create new key pair**
+  ![instance.png](/images/4-create-ec2-instance/4.3.png)
+
+#### 6. Create a Key Pair
+
+- In **Create key pair**, enter the following information:
+
+  - **Key pair name**: `nextjs-kp`
+
+  - **Key pair type**: Select **RSA**
+
+  - **Private key file format**: **.pem**
+
+  - Then click **Create key pair**. A **.pem** file will automatically be downloaded to your computer
+    ![instance.png](/images/4-create-ec2-instance/4.4.png)
 
 {{% notice warning %}}
-Warning: Do not select **Proceed without a key pair** (not recommended). If you create an instance without a key pair, you will not be able to connect to it.
+Warning: Do not select Proceed without a key pair (Not recommended). If you create an instance without a key pair, you will not be able to connect to it.
 {{% /notice %}}
 
 #### 7. Configure Security Group
 
-- Next to **Network settings**, click **Edit**. For the **Security group name**, you'll see that a security group has already been created and selected for you. Select the security group you created during setup by following these steps:
-  - Choose **Select existing security group**.
-  - From **Common security groups**, select your security group from the list of available security groups.
-  - Review and launch the instance.
-  - Leave the default settings for other instance options.
-  - Review your instance configuration summary in the **Summary panel**, and when you're ready, click **Launch instance**.
+- In **Network settings**, click **Edit** next to it. For Security group name, select a security group that you created during setup by following these steps:
 
-![sg-config.png](/images/4-create-ec2-instance/sg-config.png)
+  - Select **Select existing security group**.
 
-#### 8. Confirm and Monitor
+  - From Common security groups, choose your security group from the list.
 
-- A confirmation page will appear indicating that your instance is being launched. Click **View all instances** to close the confirmation page and return to the console interface.
-- On the **Instances** screen, you can see the status of your launch process. It takes a short time for the instance to start. When it is launched, its status will change from **pending** to **running**, and it will receive a public DNS name. If the **Public IPv4 DNS** column is hidden, click the settings icon in the upper-right corner, enable **Public IPv4 DNS**, and click **Confirm**.
-- It may take a few minutes for the instance to be ready for connection. Check if the instance passes the status check; you can see this information in the **Status check** column.
+  - Confirm and launch the instance.
 
-![review.png](/images/4-create-ec2-instance/review-png.png)
+  - Keep the default selections for other instance settings.
 
-- Review your Public IPv4, Please choose **EC2 Instance** > **Networking** tab > **Public IPv4 Address**
+  - Review the instance configuration summary in **Summary**, and when ready, click **Launch instance**.
 
-  ![check-ipv4.png](/images/4-create-ec2-instance/check-ipv4.png)
+  ![sg-config.png](/images/4-create-ec2-instance/4.6.png)
 
-#### Test Connection to EC2 Instance
+#### 8. Confirm and Check Status
 
-#### 1. Connect to EC2 Instance via SSH
+- A notification page will appear indicating that your instance is launching. Click **View all instances** to return to the console.
+  ![view.png](/images/4-create-ec2-instance/4.7.png)
 
-- Select the EC2 instance you just created, and click **Connect**.
+- In the **Instances** screen, check the EC2 status:
+
+  - **pending** → booting up
+
+  - **running** → successfully started, has a Public DNS
+
+- Wait a few minutes for EC2 to be ready, check **Status check** to ensure stability.
+
+- View the Public IPv4 at **EC2 Instance** > **Networking** > **Public IPv4 Address**.
+  ![review.png](/images/4-create-ec2-instance/4.8.png)
+
+#### 9. Connecting to the EC2 Instance
+
+#### 9.1. Connecting via SSH
+
+- Select the created EC2 Instance, then choose **Connect**
+  ![connect.png](/images/4-create-ec2-instance/4.9.png)
+
 - In the **Connect to instance** interface, select the **SSH Client** tab.
+  ![ssh-client.png](/images/4-create-ec2-instance/4.10.png)
 
-![ssh-ec2.png](/images/4-create-ec2-instance/ssh-ec2.png)
+- If using **MacOS**, copy the example SSH command and paste it into **Terminal**:
 
-- If you're using Windows, install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) to run Linux commands (alternatively, you can use the [Putty](https://www.putty.org/) application).
-- If you're using macOS, copy the example SSH command and paste it into the **Terminal**. The command will have the following syntax:
+  ```
+  $ chmod 400 "nextjs-kp.pem"
+  $ ssh -i path/to/key-pair.pem ubuntu@domain
+  ```
 
-```
-$ chmod 400 "key-pair.pem"
-$ ssh -i path/to/key-pair.pem ec2-user@domain
-```
+- If using **Windows**, install [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) or use PuTTY tools: [PuTTY Executable
+  (putty.exe)](https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe), [SCP Client
+  (pscp.exe)](https://the.earth.li/~sgtatham/putty/latest/w64/pscp.exe), [RSA và DSA Key Generation Utility
+  (puttygen.exe)](https://the.earth.li/~sgtatham/putty/latest/w64/puttygen.exe)
 
-#### 2. Successful Connection
+**Connecting via PuTTY:**
 
-![complete.png](/images/4-create-ec2-instance/complete.png)
+- Open **puttygen.exe** and **Load** the private key file.
+
+- Convert and save as **nextjs-kp.ppk**.
+  ![connect1.png](/images/4-create-ec2-instance/4.11.png)
+  ![connect2.png](/images/4-create-ec2-instance/4.12.png)
+- Use **putty.exe** to connect using Public IPv4.
+  ![ipv4.png](/images/4-create-ec2-instance/4.14.png)
+  ![ipv4.png](/images/4-create-ec2-instance/4.15.png)
+  ![ipv4.png](/images/4-create-ec2-instance/4.16.png)
+  ![ipv4.png](/images/4-create-ec2-instance/4.17.png)
+  ![login.png](/images/4-create-ec2-instance/4.18.png)
+
+#### 9.2. Successful Connection
+
+![complete.png](/images/4-create-ec2-instance/4.19.png)
+
+{{< center>}}
+
+### **Completed! 🚀**
+
+{{< /center>}}
