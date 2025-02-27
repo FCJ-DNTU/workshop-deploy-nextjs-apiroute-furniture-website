@@ -8,7 +8,8 @@ pre: "<b>3.2. </b>"
 
 #### Khái niệm về VPC Security Group
 
-Security Group là một tập hợp các quy tắc kiểm soát lưu lượng mạng vào (Inbound) và ra (Outbound) của các instance trong Amazon VPC. Nó hoạt động như một tường lửa ảo, giúp quản lý và bảo vệ tài nguyên.
+Security Group là một tập hợp các quy tắc kiểm soát lưu lượng mạng vào (Inbound) và ra (Outbound) của các instance trong
+Amazon VPC. Nó hoạt động như một tường lửa ảo, giúp quản lý và bảo vệ tài nguyên.
 
 #### Đặc Điểm Chính Của Security Group
 
@@ -26,27 +27,29 @@ Tiếp theo, chúng ta sẽ khởi tạo 2 SGs đại diện cho public subnets 
 
 #### 2.1. Khởi tạo Public Security Group (SG Public - EC2)
 
-- Truy cập [Security groups](https://ap-southeast-1.console.aws.amazon.com/vpcconsole/home?region=ap-southeast-1#SecurityGroups:) và chọn **Create security group**
+- Truy cập [Security
+  groups](https://ap-southeast-1.console.aws.amazon.com/vpcconsole/home?region=ap-southeast-1#SecurityGroups:) và chọn
+  **Create security group**
   ![security-groups](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.1.png)
 - Trong Interface **Create Security Group**, thêm những thông tin sau cho **public-sg-ec2**
 
-  - **Security group name:** `public-sg-ec2`
-  - **Description:** `Public Security Group for EC2`
-  - **VPC:** Chọn VPC bạn đang sử dụng
-    ![basic-details](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.2.png)
+- **Security group name:** `public-sg-ec2`
+- **Description:** `Public Security Group for EC2`
+- **VPC:** Chọn VPC bạn đang sử dụng
+  ![basic-details](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.2.png)
 
 - Thêm **Inbound Rules** tương ứng cho **public-sg-ec2**
 
-  | Protocol   | Port Range | Source                | Mô tả                           |
-  | ---------- | ---------- | --------------------- | ------------------------------- |
-  | HTTP       | 80         | 0.0.0.0/0             | Cho phép truy cập website       |
-  | HTTPS      | 443        | 0.0.0.0/0             | Hỗ trợ SSL/TLS                  |
-  | SSH        | 22         | My IP Address         | Đăng nhập SSH vào EC2           |
-  | Custom TCP | 3000       | 0.0.0.0/0             | Chạy Next.js dev mode           |
-  | Custom TCP | 27017      | SG-Private-DocumentDB | Cho phép EC2 kết nối DocumentDB |
+| Protocol   | Port Range | Source                | Mô tả                           |
+| ---------- | ---------- | --------------------- | ------------------------------- |
+| HTTP       | 80         | 0.0.0.0/0             | Cho phép truy cập website       |
+| HTTPS      | 443        | 0.0.0.0/0             | Hỗ trợ SSL/TLS                  |
+| SSH        | 22         | 0.0.0.0/0             | Đăng nhập SSH vào EC2           |
+| Custom TCP | 3000       | 0.0.0.0/0             | Chạy Next.js dev mode           |
+| Custom TCP | 27017      | SG-Private-DocumentDB | Cho phép EC2 kết nối DocumentDB |
 
-  ![inbound-rules](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.3.png)
-  **❗❗Bổ sung Inbound cho port 27017 sau**
+![inbound-rules](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.3.png)
+**❗❗Bổ sung Inbound cho port 27017 sau**
 
 - Allows all **Outbound** traffic và chọn **Create security group**
   ![outbound-rules](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.4.png)
@@ -56,18 +59,18 @@ Tiếp theo, chúng ta sẽ khởi tạo 2 SGs đại diện cho public subnets 
 
 - Trong Interface **Create Security Group**, thêm những thông tin sau cho **private-sg-documentdb**
 
-  - **Security group name:** `private-sg-documentdb`
-  - **Description:** `Private Security Group for DocumentDB`
-  - **VPC:** Chọn VPC bạn đang sử dụng
-    ![basic-details](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.6.png)
+- **Security group name:** `private-sg-documentdb`
+- **Description:** `Private Security Group for DocumentDB`
+- **VPC:** Chọn VPC bạn đang sử dụng
+  ![basic-details](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.6.png)
 
 - Thêm **Inbound Rules** tương ứng cho **private-sg-documentdb**
 
-  | Protocol   | Port Range | Source        | Mô tả                              |
-  | ---------- | ---------- | ------------- | ---------------------------------- |
-  | Custom TCP | 27017      | SG-Public-EC2 | Chỉ EC2 có thể truy cập DocumentDB |
+| Protocol   | Port Range | Source        | Mô tả                              |
+| ---------- | ---------- | ------------- | ---------------------------------- |
+| Custom TCP | 27017      | SG-Public-EC2 | Chỉ EC2 có thể truy cập DocumentDB |
 
-  ![inbound-rules](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.7.png)
+![inbound-rules](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.7.png)
 
 - Allows all **Outbound** traffic và chọn **Create security group**
   ![outbound-rules](/images/3-create-vpc-instance/3.2-create-vpc-sg/3.2.4.png)
