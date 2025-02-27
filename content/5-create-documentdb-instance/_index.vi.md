@@ -1,5 +1,5 @@
 ---
-title: "Khởi tạo AWS DocumentDB Service"
+title: "Khởi tạo AWS DocumentDB"
 date: 2025
 weight: 5
 chapter: false
@@ -80,23 +80,23 @@ nối), Port (cổng), và Username (tên người dùng).
 ```shell
 $ sudo yum install mysql
 $ mysql -h <endpoint> -P 3306 -u admin -p <password>
-      # $ mysql -h mysql-golang-db.c1a20mqwgeb9.ap-southeast-1.rds.amazonaws.com -P 3306 -u admin -pAdmin123
-      ```
+            # $ mysql -h mysql-golang-db.c1a20mqwgeb9.ap-southeast-1.rds.amazonaws.com -P 3306 -u admin -pAdmin123
+            ```
 
-      ![ec2-to-mysql.png](/images/5-create-rds-instance/ec2-to-mysql.png)
+            ![ec2-to-mysql.png](/images/5-create-rds-instance/ec2-to-mysql.png)
 
-      16. Tạo Database
-      {{% notice tip %}}
-      Admin user không thể truy cập trực tiếp với database **mysql**, chúng ta nên tạo database mới để truy cập.
-      Mình đã troubleshoot lỗi này trong một buổi, và đơn giản là do privileges bên trong RDS :D
-      {{% /notice %}} >Since RDS is a managed service, to maintain the system integrity and stability, super user
-      privileges are not provided even to the master user of the DB instance, and therefore, such error message is
-      expected, as the RDS MySQL master user by default does not have the ADMIN, ROLE_ADMIN, SUPER privileges.
+            16. Tạo Database
+            {{% notice tip %}}
+            Admin user không thể truy cập trực tiếp với database **mysql**, chúng ta nên tạo database mới để truy cập.
+            Mình đã troubleshoot lỗi này trong một buổi, và đơn giản là do privileges bên trong RDS :D
+            {{% /notice %}} >Since RDS is a managed service, to maintain the system integrity and stability, super user
+            privileges are not provided even to the master user of the DB instance, and therefore, such error message is
+            expected, as the RDS MySQL master user by default does not have the ADMIN, ROLE_ADMIN, SUPER privileges.
 
-      ```mysql
-      CREATE DATABASE blog_db;
-      # Query OK, 1 row affected (0.01 sec)
-      ```
+            ```mysql
+            CREATE DATABASE blog_db;
+            # Query OK, 1 row affected (0.01 sec)
+            ```
 
-      17. Truy cập vào Database
-      ![db.png](/images/5-create-rds-instance/db.png)
+            17. Truy cập vào Database
+            ![db.png](/images/5-create-rds-instance/db.png)
