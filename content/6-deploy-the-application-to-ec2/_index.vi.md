@@ -121,22 +121,7 @@ $ git clone https://github.com/nhungnguyen-9/e-commerce-furniture.git
   $ nano .env
   ```
 - Thêm các biến môi trường
-
-  ```bash
-    # MONGODB_URL (Thay thế bằng URL trong **Connect to this cluster with an application** của Cluster DocumentDB)
-    MONGODB_URL = 'mongodb://user123:user1234@docdb-nextjs-workshop.cluster-c10k88ou8amc.ap-southeast-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false'
-
-    JWT_SECRET='nhaxinh'
-    NEXTAUTH_SECRET='noithatnhaxinh'
-    GOOGLE_CLIENT_ID = '219204711219-vokeru88dgd2k457jbm0726l8305rqls.apps.googleusercontent.com'
-    GOOGLE_CLIENT_SECRET = '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'
-    CLOUD_NAME = 'dq7vzcw0s'
-    CLOUDINARY_API_KEY = '697131896399243'
-    CLOUDINARY_API_SECRET = '0lwphoEnA8VpX4h6bs9xl0SbuXc'
-
-    # Cập nhật theo domain hoặc IP của EC2
-    NEXT_PUBLIC_API_URL = 'http://ec2-18-140-1-54.ap-southeast-1.compute.amazonaws.com:3000'
-  ```
+  Tải file **.env** và thêm các biến môi trường vào **[.env](https://drive.google.com/file/d/1PH2-dZjuWKzp2cHs6MVGqb57LLpHhWoR/view?usp=sharing)**
 
   ![env](/images/6-deploy-the-application-to-ec2/6.13.png)
 
