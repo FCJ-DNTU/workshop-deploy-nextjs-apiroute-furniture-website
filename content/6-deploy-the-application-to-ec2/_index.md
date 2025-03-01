@@ -6,63 +6,193 @@ chapter: false
 pre: "<b>6. </b>"
 ---
 
-To store images for our application, we will use AWS S3 storage service.
+#### 1. Install Git and NodeJS
 
-#### Simple Storage Service (Amazon S3)
+- Install Git
 
-**Amazon Simple Storage Service (Amazon S3)** is an object storage service that offers industry-leading scalability,
-data availability, security, and performance.
+  ```shell
+  $ sudo apt install -y git
+  $ git --version
+  ```
 
-#### Set up S3 Storage Service
+- Install NodeJS and npm
 
-1. Visit [AWS S3](https://ap-southeast-1.console.aws.amazon.com/s3/home?region=ap-southeast-1#)
+  ```shell
+  $ curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+  $ sudo apt install -y nodejs
+  $ node -v
+  $ npm -v
+  ```
 
-2. Select **Create bucket**:
+- Install PM2 to manage the application
 
-- Choose **AWS Region**: **Asia Pacific (Singapore) ap-southeast-1**
-- Enter a unique name for your **S3 bucket**.
-- Since we want the images to be publicly accessible for the client, **uncheck** **Block all public access**, and check
-**Confirm**.
-![create-bucket.png](/images/6-create-s3-instance/create-bucket.png)
-- Click **Create bucket**.
+  ```shell
+  $ sudo npm install -g pm2
+  $ pm2 -v
+  ```
 
-3. Access the S3 Bucket:
+#### 2. Clone Repository
 
-- Once the bucket is created, go to your S3 bucket and check its details.
-![s3-bucket.png](/images/6-create-s3-instance/s3-bucket.png)
+```shell
+$ git clone https://github.com/nhungnguyen-9/e-commerce-furniture.git
+```
 
-4. Upload an object to the S3 Bucket:
+- Use the **`ls`** command to check if the project has been cloned successfully
+  ![clone-project](/images/6-deploy-the-application-to-ec2/6.1.png)
 
-- Go to your S3 bucket, select **Upload**.
-- Drag and drop a file into the **Upload** box and click **Upload**.
-![upload-object.png](/images/6-create-s3-instance/upload-object.png)
+- Navigate to the **e-commerce-furniture** directory and install dependencies
 
-5. Create an IAM Role for EC2:
-{{% notice note %}}
-Best practices: Instead of connecting to S3 using **Access Key, Secret Key**, for enhanced security, use an **IAM Role**
-to authorize an **EC2 Instance** to connect to the **S3 Bucket**.
-{{% /notice %}}
+  ```shell
+  $ cd e-commerce-furniture
+  $ npm install
+  ```
 
-- First, create a **role** for the **EC2 Service** to access the **S3 bucket**:
-- Go to [Roles](https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/roles), click **Create Role**.
-- In the **Select trusted entity** interface, choose **AWS Service** as the entity type.
-- Select **EC2** as the use case, and click **Next**.
-![iam-role.png](/images/6-create-s3-instance/iam-role.png)
-- Then, choose **AmazonS3FullAccess**, and click **Next** (For more security, you can create a **Custom Policy**).
-![policy.png](/images/6-create-s3-instance/policy.png)
-- After that, set the **Role name**, **Description**, and review the **Role Details**.
+#### 3. Migrate data from MongoDB to Amazon DocumentDB
 
-6. Attach the Role to EC2:
+- In this workshop, we will use the offline migration method. You can refer to other methods in this blog: [Migrate from
+  MongoDB to Amazon
+  DocumentDB](https://aws.amazon.com/blogs/database/migrate-from-mongodb-to-amazon-documentdb-using-the-offline-method/)
+  ![migrate-offline](/images/6-deploy-the-application-to-ec2/offline-migration-approach.gif)
 
-- Go to [EC2 Instances](https://ap-southeast-1.console.aws.amazon.com/ec2/home?region=ap-southeast-1#Instances:).
-- Select the EC2 Instance you created.
-- Choose **Actions** > **Security** > **Modify IAM Role**.
-![attach-role.png](/images/6-create-s3-instance/attach-role.png)
-- Select the IAM Role you just created and click **Update IAM Role**.
-![update-iam-role.png](/images/6-create-s3-instance/update-iam-role.png)
+- Install **mongosh**
 
-7. Test the connection between EC2 and S3:
+  ```shell
+  $ wget -qO - https://pgp.mongodb.com/server-6.0.asc | sudo tee /usr/share/keyrings/mongodb-server-key.asc
+  $ echo "deb [signed-by=/usr/share/keyrings/mongodb-server-key.asc] https://repo.mongodb.org/apt/ubuntu
+  focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+  $ sudo apt update
+  $ sudo apt install -y mongodb-mongosh
+  $ mongosh --version
+  ```
 
-- Access the EC2 instance and run `$ aws s3 ls s3://my-bucket-name`.
+- Check connection to **DocumentDB**
 
-![ec2-to-s3.png](/images/6-create-s3-instance/ec2-to-s3.png)
+- Go to the **Amazon DocumentDB Cluster** interface, then select the created cluster
+  ![choose-cluster](/images/6-deploy-the-application-to-ec2/6.3.png)
+- Download the **global-bundle.pem** file to EC2 and connect to DocumentDB (replace **insertYourPassword** with your actual password)
+  ![connect](/images/6-deploy-the-application-to-ec2/6.4.png)
+  ![connect2](/images/6-deploy-the-application-to-ec2/6.5.png)
+
+- Run **show dbs** to check if there are any databases in DocumentDB
+  ![check](/images/6-deploy-the-application-to-ec2/6.6.png)
+
+- Next, proceed with data migration
+
+- Install **MongoDB Database Tools**
+
+  ```shell
+  $ wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.9.0.tgz
+  $ tar -xvzf mongodb-database-tools-ubuntu2204-x86_64-100.9.0.tgz
+  $ sudo mv mongodb-database-tools-ubuntu2204-x86_64-100.9.0/bin/* /usr/local/bin/
+  $ sudo apt install -y mongodb-mongosh
+  $ mongodump --version
+  ```
+
+- **Dump** data from MongoDB. The data will be backed up into a folder named **backup**
+
+  ```shell
+  $ mongodump --uri="mongodb+srv://nguyennhung9846:3siHCKWL69z5DoS1@nhaxinh.02uuoha.mongodb.net/?retryWrites=true&w=majority&appName=nhaxinh" --out=backup
+  $ ls
+  ```
+
+  ![mongodump](/images/6-deploy-the-application-to-ec2/6.7.png)
+
+- **Restore** data to DocumentDB
+- In the created cluster interface, copy the connection string
+  ![mongorestore](/images/6-deploy-the-application-to-ec2/6.8.png)
+- Run the following command to restore data to DocumentDB (replace **insertYourPassword** with your actual password)
+
+  ```shell
+  $ mongorestore --uri="mongodb://user123:<insertYourPassword>@docdb-nextjs-workshop.cluster-c10k88ou8amc.ap-southeast-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false" --dir=backup --drop
+  $ ls
+  ```
+
+  ![mongorestore](/images/6-deploy-the-application-to-ec2/6.9.png)
+
+- Verify data restoration and reconnect to DocumentDB
+- In the **Cluster docdb-nextjs-workshop** interface, copy **Connect to this cluster with the mongo shell**, then paste it into EC2 to test the connection
+  ![check-connect](/images/6-deploy-the-application-to-ec2/6.10.png)
+  ![check-connect](/images/6-deploy-the-application-to-ec2/6.11.png)
+- Run the following commands to check databases and collections
+
+  ```shell
+  $ show dbs
+  $ use test
+  $ show collections
+  ```
+
+  ![check-db](/images/6-deploy-the-application-to-ec2/6.12.png)
+
+#### 4. Add environment variables (.env)
+
+- Create a **.env** file to store database connection details and application configurations
+
+  ```shell
+  $ nano .env
+  ```
+
+- Add environment variables
+
+Download the **.env** file and add the required variables **[.env](https://drive.google.com/file/d/1PH2-dZjuWKzp2cHs6MVGqb57LLpHhWoR/view?usp=sharing)**
+
+![env](/images/6-deploy-the-application-to-ec2/6.13.png)
+
+#### 5. Build and run the application
+
+- Build the application
+
+  ```
+  npm run build
+  ```
+
+- Run the application with PM2
+
+  ```
+  pm2 start npm --name "nextjs-app" -- run start
+  pm2 save
+  pm2 startup
+  ```
+
+- Check if the application is running
+
+  ```
+  pm2 list
+  ```
+
+  ![build](/images/6-deploy-the-application-to-ec2/6.14.png)
+
+#### 6. Verify deployment
+
+- Open a browser and visit
+
+  ```
+  http://your-ec2-public-ip:3000
+  ```
+
+  ![deploy](/images/6-deploy-the-application-to-ec2/6.15.png)
+
+#### 7. Verify storage in DocumentDB
+
+- In the created cluster, copy the connection string under **Connect to this cluster with an application**
+- In EC2, run the following command (replace **insertYourPassword** with your actual password)
+
+  ```
+  mongosh docdb-nextjs-workshop.cluster-c10k88ou8amc.ap-southeast-1.docdb.amazonaws.com:27017 --tls --tlsCAFile
+  global-bundle.pem --retryWrites=false --username user123 --password <your-cluster-documentdb-password>
+  ```
+
+- Check the stored data
+
+  ```
+  use test
+  show collections
+  db.your-collection.find().pretty()
+  ```
+
+  ![check-database](/images/6-deploy-the-application-to-ec2/6.16.png)
+
+{{< center>}}
+
+### **Completed! 🚀**
+
+{{< /center>}}
