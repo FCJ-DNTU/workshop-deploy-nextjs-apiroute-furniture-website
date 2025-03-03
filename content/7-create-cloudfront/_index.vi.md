@@ -6,127 +6,135 @@ chapter: false
 pre: "<b>7. </b>"
 ---
 
-Chúng ta đã hoàn thành xây dựng Infrastructure, tiếp theo chỉ cần triển khai ứng dụng Go lên EC2 Instance là hoàn thành
-bài lab!!! xd
+Sau khi deploy ứng dụng lên EC2, chúng ta sẽ khởi tạo CloudFront để cải thiện hiệu suất cho website
 
-#### Cấu trúc dự án
+#### 1. Tạo CloudFront Distribution
 
-```
-workshop-01
-│───assets # Chứa hình ảnh sử dụng trong dự án
-│
-└───static # Chứa các file tĩnh
-│ └───css # Lưu trữ các file CSS dùng để thiết kế
-│ │ styles.css
-│
-└───templates # Lưu trữ các template HTML
-│ │ article.html # Template hiển thị bài viết
-│ │ base.html # Template cơ bản, được dùng chung cho các template khác
-│ │ edit.html # Template chỉnh sửa bài viết
-│ │ index.html # Template trang chủ
-│ │ new.html # Template tạo bài viết mới
-│
-│ .env.example # File mẫu chứa biến môi trường
-│ .gitignore # Quy định các file và thư mục sẽ bị bỏ qua khi sử dụng Git
-│ db.go # Chứa logic tương tác với cơ sở dữ liệu
-│ go.mod # Định nghĩa version của Go module và các thư viện phụ thuộc
-│ go.sum # Chứa checksums của các thư viện phụ thuộc
-│ main.go # Logic chính của ứng dụng, bao gồm render và thực hiện các thao tác CRUD cho bài viết
-│ README.md # Tài liệu mô tả về dự án
+- Vào giao diện của [CloudFront](https://us-east-1.console.aws.amazon.com/cloudfront/v4/home#/distributions) và chọn **Create distribution**
+  ![create-distribution](/images/7-create-cloudfront/7.create-distribution.png)
 
-```
+- Trong **Create distribution**, chọn những mục sau:
 
-#### 1. Cài đặt Git version control và Golang
+  - **Origin domain**: your-public-ipv4-dns-ec2
+  - **Protocol**: HTTP only
+  - **HTTP Port**: 80
+  - **Viewer protocol policy**: HTTP and HTTPS
+  - **Allowed HTTP methods**: GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE
+  - **Web Application Firewall (WAF)**: Do not enable security protections
+  - Sau đó chọn **Create distribution** để tạo distribution
+    ![create-distribution-1](/images/7-create-cloudfront/7.1.png)
+    ![create-distribution-2](/images/7-create-cloudfront/7.2.png)
+    ![create-distribution-3](/images/7-create-cloudfront/7.3.png)
 
-- Cài đặt git
+- Sẽ mất khoảng 5-10 phút để tạo, khi tạo thành công bạn sẽ thấy **Last modified**
+  ![create-success](/images/7-create-cloudfront/7.4.png)
 
-```
-$ sudo yum install git -y
-$ git --version
-```
+#### 2. Tạo Behavior Route API
 
-- Cài đặt golang
+- Trong distribution vừa mới tạo, chọn tab **Behaviors**
+- Chọn **Create Behavior**
+  ![behavior](/images/7-create-cloudfront/7.behavior.png)
 
-```
-$ wget https://go.dev/dl/go1.23.4.linux-amd64.tar.gz
-$ sudo tar -C /usr/local -xzf go1.23.4.linux-amd64.tar.gz
-$ export PATH=$PATH:/usr/local/go/bin
-$ go version
-```
+- Trong **Create behavior**, điền những thông tin sau:
 
-![installation.png](/images/7-deploy-app-to-ec2/installation.png)
+  - **Path pattern**: `/api/*`
+  - **Origin**: Chọn EC2 mà bạn đã tạo
+  - **Viewer Protocol Policy**: Redirect HTTP to HTTPS
+  - **Allowed HTTP Methods**: GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE
+  - **Cache Policy**: CachingDisabled (để API không bị cache)
+    ![create-behavior](/images/7-create-cloudfront/7.create-behavior.png)
 
-#### 2. Clone repository
+- Nhấn **Create behavior**
 
-- Clone repository Blog application của mình, hoặc các bạn có thể sử dụng repository cá nhân.
-`$ git clone https://github.com/minhnghia2k3/workshop-01.git`
+#### 3. Cập nhật lại API URL trong file .env
 
-#### 3. Export environment variables
+- Kết nối tới EC2 thông qua **EC2 Instance Connect**
+- Gõ lệnh sau để vào file **.env** để chỉnh sửa
+  ```shell
+  cd e-commerce-furniture
+  nano .env
+  ```
+- Trong **.env**, chỉnh lại **NEXT_PUBLIC_API_URL** thành **Distribution domain name** của **CloudFront**, sau đó ấn **Ctrl + X -> Y -> Enter** để lưu
+  ![change-api-url](/images/7-create-cloudfront/7.change-api-url.png)
 
-Thêm biến môi trường, các biến môi trường này là phần required trong application
+- Sau khi thay đổi file .env thì gõ lại lệnh **npm run build** để build lại project
 
-```
-$ vi ~/.bashrc
-export DATABASE_URL="admin:Admin123@tcp(<YOUR_DB_ENDPOINT>:3306)/blog_db"
-  export AWS_REGION="ap-southeast-1"
-  export S3_BUCKET_NAME="minhnghia2k3-blog-s3-bucket"
-
-  $ source ~/.bashrc
+  ```shell
+  npm run build
   ```
 
-  ![export_env.png](/images/7-deploy-app-to-ec2/export_env.png)
-
-  #### 4. Khởi chạy ứng dụng
-
-  ```
-  $ ls
-  $ cd workshop-01
-  $ go build -o ./bin/main .
-  $ ./bin/main
+- Sau khi build xong thì **restart lại pm2**
+  ```shell
+  pm2 restart all
   ```
 
-  - Thành quả chạy thành công, server sẽ open tại port **:3000**
+#### 4. Cài đặt Nginx
 
-  ![run_app.png](/images/7-deploy-app-to-ec2/run_app.png)
+Lý do sử dụng Nginx trong workshop này:
 
-  #### 5. Kiểm tra Deployment và chức năng
+**Reverse Proxy:**
 
-  - Truy cập EC2 domain e.g. http://ec2-13-250-114-245.ap-southeast-1.compute.amazonaws.com:3000/
-  ![website.png](/images/7-deploy-app-to-ec2/website.png)
-  - Test chức năng tạo blog
-  ![create-blog.png](/images/7-deploy-app-to-ec2/create-blog.png)
-  - Test chức năng chỉnh sửa blog
-  ![edit-blog.png](/images/7-deploy-app-to-ec2/edit-blog.png)
-  - Test chức năng xóa blog
+- Ban đầu, ứng dụng chạy trên EC2 với cổng 3000, Nginx giúp chuyển hướng (proxy_pass) từ cổng 80 hoặc 443 sang 3000, giúp ứng dụng có thể truy cập bằng tên miền hoặc CloudFront mà không cần chỉ định cổng
+- Ví dụ, sau khi cài đặt, bạn chỉ cần truy cập: **http://your-ip-ec2 (Không cần :3000)**. Nginx sẽ tự động chuyển request về localhost:3000 (nơi ứng dụng của bạn chạy)
 
-  ---
+- Cài đặt **Nginx**
 
-  ![finish.png](/images/7-deploy-app-to-ec2/finish.png)
-
-  #### 6. Kiểm tra lưu trữ tại Mysql và S3 bucket
-
-  Tại SSH của EC2 Instance:
-
-  **1. Kiểm tra Mysql**
-
-  ```
-  $ mysql -h mysql-golang-db.c1a20mqwgeb9.ap-southeast-1.rds.amazonaws.com -P 3306 -u admin -pAdmin123
-  $ USE blog_db;
-  $ SELECT * FROM articles;
+  ```shell
+  sudo apt update
+  sudo apt install nginx -y
   ```
 
-  | id | title | content |
-  | --- | ------------------------------------------ |
-  ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  |
-  | 1 | Introduction to Golang: A Beginner's Guide | <p>Golang, or Go, is an open-source programming language designed
-    by Google. Known for its simplicity, concurrency support, and performance, Go is an excellent choice for building
-    scalable web applications, cloud-native solutions, and microservices.<br><span
-      style="background-color: rgb(194, 224, 244);">`fmt.Println("Hello Go!")`</span></p>
-  <p><span style="background-color: rgb(194, 224, 244);"><img
-        src="https://minhnghia2k3-blog-s3-bucket.s3.amazonaws.com/uploads/1736500595218035330.png"></span></p> |
+- Cấu hình Nginx để chuyển hướng CloudFront
 
-  **2. Kiểm tra Bucket**
+  - Sửa file config của Nginx:
 
-  - Tại folder **uploads/**, có thể thấy chúng ta đã lưu trữ thành công từ application về S3 bucket
-  ![check_bucket.png](/images/7-deploy-app-to-ec2/check-bucket.png)
+    ```shell
+    sudo nano /etc/nginx/sites-available/default
+    ```
+
+  - Thêm đoạn sau vào:
+
+    ```shell
+    server {
+        listen 80;
+        server_name distribution-domain-name-cloudfront;
+
+        location / {
+            proxy_pass http://localhost:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+    }
+    ```
+
+  - Lưu lại **(Ctrl + X → Y → Enter)**
+
+- Kiểm tra có lỗi cấu hình không
+
+  ```shell
+  sudo nginx -t
+  ```
+
+- Nếu không có lỗi, restart Nginx:
+
+  ```shell
+  sudo systemctl restart nginx
+  ```
+
+#### 5. Kiểm tra
+
+- Copy **Distribution domain name** và dán vào một tab mới
+  ![test](/images/7-create-cloudfront/7.test.png)
+
+Chúng ta có thể so sánh hiệu suất giữa EC2(bên trái) và CloudFront(bên phải) -> CloudFront đã tối ưu hiệu suất hơn EC2
+| ![EC2 Test](/images/7-create-cloudfront/7.ec2.png) | ![CloudFront Test](/images/7-create-cloudfront/7.cloudfront-test2.png) |
+|----------------------------------------------------|----------------------------------------------------|
+
+{{< center>}}
+
+### **Hoàn thành! 🚀**
+
+{{< /center>}}
