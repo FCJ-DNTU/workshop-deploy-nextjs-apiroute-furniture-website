@@ -6,129 +6,135 @@ chapter: false
 pre: "<b>7. </b>"
 ---
 
-We have completed setting up the infrastructure. Now, we just need to deploy the Go application to the EC2 instance to
-complete the lab! xd
+After deploying the application to EC2, we will initialize CloudFront to improve the website's performance
 
-#### Project Structure
+#### 1. Create CloudFront Distribution
 
-```
-workshop-01
-│───assets # Contains images used in the project
-│
-└───static # Contains static files
-│ └───css # Stores CSS files for styling
-│ │ styles.css
-│
-└───templates # Stores HTML templates
-│ │ article.html # Template for displaying an article
-│ │ base.html # Base template used across other templates
-│ │ edit.html # Template for editing an article
-│ │ index.html # Template for the homepage
-│ │ new.html # Template for creating a new article
-│
-│ .env.example # Example environment variables file
-│ .gitignore # Git ignore rules for the project
-│ db.go # Contains logic for database interactions
-│ go.mod # Specifies Go module version and dependencies
-│ go.sum # Contains checksums for dependencies
-│ main.go # Main application logic, includes rendering and CRUD operations for articles
-│ README.md # Documentation for the project
-```
+- Go to the [CloudFront](https://us-east-1.console.aws.amazon.com/cloudfront/v4/home#/distributions) interface and select **Create distribution**
+  ![create-distribution](/images/7-create-cloudfront/7.create-distribution.png)
 
-#### 1. Install Git version control and Golang
+- In **Create distribution**, select the following options:
 
-- Install Git:
+  - **Origin domain**: your-public-ipv4-dns-ec2
+  - **Protocol**: HTTP only
+  - **HTTP Port**: 80
+  - **Viewer protocol policy**: HTTP and HTTPS
+  - **Allowed HTTP methods**: GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE
+  - **Web Application Firewall (WAF)**: Do not enable security protections
+  - Then select **Create distribution** to create the distribution
+    ![create-distribution-1](/images/7-create-cloudfront/7.1.png)
+    ![create-distribution-2](/images/7-create-cloudfront/7.2.png)
+    ![create-distribution-3](/images/7-create-cloudfront/7.3.png)
 
-```
-$ sudo yum install git -y
-$ git --version
-```
+- It will take about 5-10 minutes to create. Once successfully created, you will see **Last modified**
+  ![create-success](/images/7-create-cloudfront/7.4.png)
 
-- Install Golang:
+#### 2. Create Behavior Route API
 
-```
-$ wget https://go.dev/dl/go1.23.4.linux-amd64.tar.gz
-$ sudo tar -C /usr/local -xzf go1.23.4.linux-amd64.tar.gz
-$ export PATH=$PATH:/usr/local/go/bin
-$ go version
-```
+- In the newly created distribution, go to the **Behaviors** tab
+- Click **Create Behavior**
+  ![behavior](/images/7-create-cloudfront/7.behavior.png)
 
-![installation.png](/images/7-deploy-app-to-ec2/installation.png)
+- In **Create behavior**, fill in the following details:
 
-#### 2. Clone the repository
+  - **Path pattern**: `/api/*`
+  - **Origin**: Select the EC2 instance you created
+  - **Viewer Protocol Policy**: Redirect HTTP to HTTPS
+  - **Allowed HTTP Methods**: GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE
+  - **Cache Policy**: CachingDisabled (to prevent API caching)
+    ![create-behavior](/images/7-create-cloudfront/7.create-behavior.png)
 
-- Clone the Blog application repository, or you can use your personal repository.
+- Click **Create behavior**
 
-```
-$ git clone https://github.com/minhnghia2k3/workshop-01.git
-```
+#### 3. Update API URL in the .env File
 
-#### 3. Export environment variables
+- Connect to EC2 using **EC2 Instance Connect**
+- Run the following command to open the **.env** file for editing
+  ```shell
+  cd e-commerce-furniture
+  nano .env
+  ```
+- In **.env**, update **NEXT_PUBLIC_API_URL** to the **Distribution domain name** of CloudFront, then press **Ctrl + X -> Y -> Enter** to save
+  ![change-api-url](/images/7-create-cloudfront/7.change-api-url.png)
 
-Add the required environment variables for the application:
+- After updating the .env file, run the following command to rebuild the project
 
-```
-$ vi ~/.bashrc
-export DATABASE_URL="admin:Admin123@tcp(<YOUR_DB_ENDPOINT>:3306)/blog_db"
-  export AWS_REGION="ap-southeast-1"
-  export S3_BUCKET_NAME="minhnghia2k3-blog-s3-bucket"
-
-  $ source ~/.bashrc
+  ```shell
+  npm run build
   ```
 
-  ![export_env.png](/images/7-deploy-app-to-ec2/export_env.png)
-
-  #### 4. Run the application
-
-  ```
-  $ ls
-  $ cd workshop-01
-  $ go build -o ./bin/main .
-  $ ./bin/main
+- Once the build is complete, **restart pm2**
+  ```shell
+  pm2 restart all
   ```
 
-  - If successful, the server will open on port **:3000**.
+#### 4. Install Nginx
 
-  ![run_app.png](/images/7-deploy-app-to-ec2/run_app.png)
+Reasons for using Nginx in this workshop:
 
-  #### 5. Test Deployment and Functionality
+**Reverse Proxy:**
 
-  - Access the EC2 domain, e.g., http://ec2-13-250-114-245.ap-southeast-1.compute.amazonaws.com:3000/
-  ![website.png](/images/7-deploy-app-to-ec2/website.png)
-  - Test blog creation:
-  ![create-blog.png](/images/7-deploy-app-to-ec2/create-blog.png)
-  - Test blog editing:
-  ![edit-blog.png](/images/7-deploy-app-to-ec2/edit-blog.png)
-  - Test blog deletion.
+- Initially, the application runs on EC2 at port 3000. Nginx helps redirect (proxy_pass) requests from ports 80 or 443 to 3000, allowing access via the domain name or CloudFront without specifying a port
+- For example, after setup, you can access: **http://your-ip-ec2 (without :3000)**. Nginx will automatically forward requests to localhost:3000 (where your application runs)
 
-  ---
+- Install **Nginx**
 
-  ![finish.png](/images/7-deploy-app-to-ec2/finish.png)
-
-  #### 6. Check Storage in MySQL and S3 Bucket
-
-  From the EC2 SSH terminal:
-
-  **1. Check MySQL:**
-
-  ```
-  $ mysql -h mysql-golang-db.c1a20mqwgeb9.ap-southeast-1.rds.amazonaws.com -P 3306 -u admin -pAdmin123
-  $ USE blog_db;
-  $ SELECT * FROM articles;
+  ```shell
+  sudo apt update
+  sudo apt install nginx -y
   ```
 
-  | id | title | content |
-  | --- | ------------------------------------------ |
-  ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  |
-  | 1 | Introduction to Golang: A Beginner's Guide | <p>Golang, or Go, is an open-source programming language designed
-    by Google. Known for its simplicity, concurrency support, and performance, Go is an excellent choice for building
-    scalable web applications, cloud-native solutions, and microservices.<br><span
-      style="background-color: rgb(194, 224, 244);">`fmt.Println("Hello Go!")`</span></p>
-  <p><span style="background-color: rgb(194, 224, 244);"><img
-        src="https://minhnghia2k3-blog-s3-bucket.s3.amazonaws.com/uploads/1736500595218035330.png"></span></p> |
+- Configure Nginx to redirect CloudFront
 
-  **2. Check the Bucket:**
+  - Edit the Nginx config file:
 
-  - In the **uploads/** folder, you can see that the application successfully stored the file to the S3 bucket.
-  ![check_bucket.png](/images/7-deploy-app-to-ec2/check-bucket.png)
+    ```shell
+    sudo nano /etc/nginx/sites-available/default
+    ```
+
+  - Add the following:
+
+    ```shell
+    server {
+        listen 80;
+        server_name distribution-domain-name-cloudfront;
+
+        location / {
+            proxy_pass http://localhost:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+    }
+    ```
+
+  - Save the file **(Ctrl + X → Y → Enter)**
+
+- Check for configuration errors
+
+  ```shell
+  sudo nginx -t
+  ```
+
+- If no errors are found, restart Nginx
+
+  ```shell
+  sudo systemctl restart nginx
+  ```
+
+#### 5. Test the Setup
+
+- Copy **Distribution domain name** and paste it into a new browser tab
+  ![test](/images/7-create-cloudfront/7.test.png)
+
+We can compare the performance between EC2 (left) and CloudFront (right) -> CloudFront has optimized the performance over EC2
+| ![EC2 Test](/images/7-create-cloudfront/7.ec2.png) | ![CloudFront Test](/images/7-create-cloudfront/7.cloudfront-test2.png) |
+|----------------------------------------------------|----------------------------------------------------|
+
+{{< center>}}
+
+### **Completed! 🚀**
+
+{{< /center>}}
