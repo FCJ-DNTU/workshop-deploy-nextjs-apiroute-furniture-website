@@ -134,6 +134,7 @@ $ mongorestore --uri="mongodb://user123:<insertYourPassword>
   - Tạo file **.env** chứa thông tin kết nối database và cấu hình ứng dụng
 
   ```shell
+  $ touch .env
   $ nano .env
   ```
 

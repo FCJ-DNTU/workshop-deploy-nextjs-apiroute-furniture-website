@@ -97,7 +97,7 @@ Lý do sử dụng Nginx trong workshop này:
     ```shell
     server {
         listen 80;
-        server_name distribution-domain-name-cloudfront;
+        server_name _;
 
         location / {
             proxy_pass http://localhost:3000;
