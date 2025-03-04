@@ -58,7 +58,8 @@ Cho phép user sử dụng các thao tác của EC2 chỉ trong region ap-southe
 
 **Bước 2 - Review and create**
 
-- Đặt tên policy tại **Policy name** `ec2-restricted-region`, **Description** `Allow access EC2 from region Singapore - ap-southeast-1`.
+- Đặt tên policy tại **Policy name** `ec2-restricted-region`, **Description** `Allow access EC2 from region Singapore -
+ap-southeast-1`.
 - Sau đó chọn **Create policy**
 
 ![review-and-create](/images/2-restrict-access/2.5.png)
@@ -66,17 +67,20 @@ Cho phép user sử dụng các thao tác của EC2 chỉ trong region ap-southe
 #### 3. Tạo một User Group và Policy
 
 {{% notice note %}}
-Để policy bên trên có thể tái sử dụng, chúng ta có thể gán vào IAM Group. Những IAM User trong một Group đều có quyền hạn
+Để policy bên trên có thể tái sử dụng, chúng ta có thể gán vào IAM Group. Những IAM User trong một Group đều có quyền
+hạn
 như nhau
 {{% /notice %}}
-3.1. Truy cập [User groups](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/groups) bên thanh điều hướng bên trái
+3.1. Truy cập [User groups](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/groups) bên thanh
+điều hướng bên trái
 ![user-group](/images/2-restrict-access/2.6.png)
 
 3.2. Trong giao diện **User groups**, chọn **Create group**
 
 3.3. Trong giao diện **Create user group**
 
-- Đặt tên **User group name** `ec2-restricted-group`, ở phần **Filter by Type** chọn **Customer Managed** và chọn custom policy vừa mới tạo
+- Đặt tên **User group name** `ec2-restricted-group`, ở phần **Filter by Type** chọn **Customer Managed** và chọn custom
+  policy vừa mới tạo
 - Chọn **Create user group**
   ![create-user-group](/images/2-restrict-access/2.7.png)
 
@@ -85,7 +89,8 @@ như nhau
 
 #### 4. Tạo User và gán vào User Group
 
-4.1. Truy cập [Users](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/users) bên thanh điều hướng bên trái
+4.1. Truy cập [Users](https://us-east-1.console.aws.amazon.com/iam/home?region=ap-southeast-1#/users) bên thanh điều
+hướng bên trái
 ![user-tab](/images/2-restrict-access/2.9.png)
 
 4.2. Chọn **Create user**
@@ -103,7 +108,7 @@ Tại **Bước 1 - Specify user details**
 
   4.4.
 
-  Tại **Bước 2 - Set permissions**
+Tại **Bước 2 - Set permissions**
 
 - Chọn **Add user to group**
 - Chọn group chúng ta vừa tạo e.g. **ec2-restricted-group**
@@ -112,7 +117,7 @@ Tại **Bước 1 - Specify user details**
 
   4.5.
 
-  Tại **Bước 3 - Review and Create**
+Tại **Bước 3 - Review and Create**
 
 - Kiểm tra thông tin **user** và **permission**
 - Chọn **Create user**
@@ -120,7 +125,7 @@ Tại **Bước 1 - Specify user details**
 
   4.6.
 
-  Tại **Bước 4 - Retrieve password**
+Tại **Bước 4 - Retrieve password**
 
 - Lưu trữ hoặc tải xuống bản **.csv** để quản lý user
   ![review-pwd](/images/2-restrict-access/2.13.png)
@@ -137,8 +142,8 @@ Tại **Bước 1 - Specify user details**
 - Kiểm tra dịch vụ EC2 trên region **ap-southeast-1**
   ![check_region.png](/images/2-restrict-access/2.17.png)
 
-{{< center >}}
+{{< center>}}
 
 ### **Hoàn thành! 🚀**
 
-{{< /center >}}
+{{< /center>}}

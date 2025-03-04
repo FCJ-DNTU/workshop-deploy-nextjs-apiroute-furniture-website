@@ -27,7 +27,7 @@ act as an Application Server handling both the Frontend and Backend.
 - t2.medium provides 2 vCPUs and 4GB RAM, sufficient to run a Next.js Fullstack application (including API Routes).
 - t2.medium provides 2 vCPUs and 4GB RAM, sufficient to run a Next.js Fullstack application (including API Routes).
 - **Supports Burstable Performance:** T2 instances are Burstable Performance Instances, meaning they can increase CPU
-performance when needed.
+  performance when needed.
 - **Scalability:** If expansion is needed, switching to t3.medium or m5.large is easy without changing the architecture.
 
 **In this workshop, we will choose the t2.medium instance on an On-Demand basis in the ap-southeast-1 (Singapore)
@@ -68,26 +68,26 @@ region**
 - Select **Quick Start**, then choose **Ubuntu**. This is the operating system (OS) for your instance.
 
 - From Amazon Machine Image (AMI), select **Ubuntu 24.04 LTS HVM**. Note that this AMI is marked as **Free tier
-eligible**. An Amazon Machine Image (AMI) is a base configuration used as a template for your instance.
-![ami.png](/images/4-create-ec2-instance/4.2.png)
+  eligible**. An Amazon Machine Image (AMI) is a base configuration used as a template for your instance.
+  ![ami.png](/images/4-create-ec2-instance/4.2.png)
 
 #### 5. Choose an Instance Type
 
 - In Instance type, select **t2.medium**, then under **Key pair (login)**, select **Create new key pair**
-![instance.png](/images/4-create-ec2-instance/4.3.png)
+  ![instance.png](/images/4-create-ec2-instance/4.3.png)
 
 #### 6. Create a Key Pair
 
 - In **Create key pair**, enter the following information:
 
-- **Key pair name**: `nextjs-kp`
+  - **Key pair name**: `nextjs-kp`
 
-- **Key pair type**: Select **RSA**
+  - **Key pair type**: Select **RSA**
 
-- **Private key file format**: **.pem**
+  - **Private key file format**: **.pem**
 
 - Then click **Create key pair**. A **.pem** file will automatically be downloaded to your computer
-![instance.png](/images/4-create-ec2-instance/4.4.png)
+  ![instance.png](/images/4-create-ec2-instance/4.4.png)
 
 {{% notice warning %}}
 Warning: Do not select Proceed without a key pair (Not recommended). If you create an instance without a key pair, you
@@ -97,7 +97,7 @@ will not be able to connect to it.
 #### 7. Configure Security Group
 
 - In **Network settings**, click **Edit** next to it. For Security group name, select a security group that you created
-during setup by following these steps:
+  during setup by following these steps:
 
 - Select **Select existing security group**.
 
@@ -114,8 +114,8 @@ during setup by following these steps:
 #### 8. Confirm and Check Status
 
 - A notification page will appear indicating that your instance is launching. Click **View all instances** to return to
-the console.
-![view.png](/images/4-create-ec2-instance/4.7.png)
+  the console.
+  ![view.png](/images/4-create-ec2-instance/4.7.png)
 
 - In the **Instances** screen, check the EC2 status:
 
@@ -126,21 +126,21 @@ the console.
 - Wait a few minutes for EC2 to be ready, check **Status check** to ensure stability.
 
 - View the Public IPv4 at **EC2 Instance** > **Networking** > **Public IPv4 Address**.
-![review.png](/images/4-create-ec2-instance/4.8.png)
+  ![review.png](/images/4-create-ec2-instance/4.8.png)
 
 #### 9. Connecting via EC2 Instance
 
 - Select the created EC2 Instance, then choose **Connect**
-![connect.png](/images/4-create-ec2-instance/4.9.png)
+  ![connect.png](/images/4-create-ec2-instance/4.9.png)
 
 - In the **Connect to instance** interface, select the **EC2 Instance Connect** tab and click **Connect**
-![ssh-client.png](/images/4-create-ec2-instance/connect-ec2.png)
+  ![ssh-client.png](/images/4-create-ec2-instance/connect-ec2.png)
 
 - Successfully connected
-![success.png](/images/4-create-ec2-instance/connect-successfully.png)
+  ![success.png](/images/4-create-ec2-instance/connect-successfully.png)
 
 {{< center>}}
 
-  ### **Completed! 🚀**
+### **Completed! 🚀**
 
-  {{< /center>}}
+{{< /center>}}
