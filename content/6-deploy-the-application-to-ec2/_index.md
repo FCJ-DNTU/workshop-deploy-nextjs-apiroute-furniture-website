@@ -38,7 +38,7 @@ $ git clone https://github.com/nhungnguyen-9/e-commerce-furniture.git
 ```
 
 - Use the **`ls`** command to check if the project has been cloned successfully
-![clone-project](/images/6-deploy-the-application-to-ec2/6.1.png)
+  ![clone-project](/images/6-deploy-the-application-to-ec2/6.1.png)
 
 - Navigate to the **e-commerce-furniture** directory and install dependencies
 
@@ -50,9 +50,9 @@ $ npm install
 #### 3. Migrate data from MongoDB to Amazon DocumentDB
 
 - In this workshop, we will use the offline migration method. You can refer to other methods in this blog: [Migrate from
-MongoDB to Amazon
-DocumentDB](https://aws.amazon.com/blogs/database/migrate-from-mongodb-to-amazon-documentdb-using-the-offline-method/)
-![migrate-offline](/images/6-deploy-the-application-to-ec2/offline-migration-approach.gif)
+  MongoDB to Amazon
+  DocumentDB](https://aws.amazon.com/blogs/database/migrate-from-mongodb-to-amazon-documentdb-using-the-offline-method/)
+  ![migrate-offline](/images/6-deploy-the-application-to-ec2/offline-migration-approach.gif)
 
 - Install **mongosh**
 
@@ -68,14 +68,14 @@ $ mongosh --version
 - Check connection to **DocumentDB**
 
 - Go to the **Amazon DocumentDB Cluster** interface, then select the created cluster
-![choose-cluster](/images/6-deploy-the-application-to-ec2/6.3.png)
+  ![choose-cluster](/images/6-deploy-the-application-to-ec2/6.3.png)
 - Download the **global-bundle.pem** file to EC2 and connect to DocumentDB (replace **insertYourPassword** with your
-actual password)
-![connect](/images/6-deploy-the-application-to-ec2/6.4.png)
-![connect2](/images/6-deploy-the-application-to-ec2/6.5.png)
+  actual password)
+  ![connect](/images/6-deploy-the-application-to-ec2/6.4.png)
+  ![connect2](/images/6-deploy-the-application-to-ec2/6.5.png)
 
 - Run **show dbs** to check if there are any databases in DocumentDB
-![check](/images/6-deploy-the-application-to-ec2/6.6.png)
+  ![check](/images/6-deploy-the-application-to-ec2/6.6.png)
 
 - Next, proceed with data migration
 
@@ -102,7 +102,7 @@ $ ls
 
 - **Restore** data to DocumentDB
 - In the created cluster interface, copy the connection string
-![mongorestore](/images/6-deploy-the-application-to-ec2/6.8.png)
+  ![mongorestore](/images/6-deploy-the-application-to-ec2/6.8.png)
 - Run the following command to restore data to DocumentDB (replace **insertYourPassword** with your actual password)
 
 ```shell
@@ -110,97 +110,97 @@ $ mongorestore --uri="mongodb://user123:<insertYourPassword>
   @docdb-nextjs-workshop.cluster-c10k88ou8amc.ap-southeast-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
   --dir=backup --drop
   $ ls
-  ```
+```
 
-  ![mongorestore](/images/6-deploy-the-application-to-ec2/6.9.png)
+![mongorestore](/images/6-deploy-the-application-to-ec2/6.9.png)
 
-  - Verify data restoration and reconnect to DocumentDB
-  - In the **Cluster docdb-nextjs-workshop** interface, copy **Connect to this cluster with the mongo shell**, then
+- Verify data restoration and reconnect to DocumentDB
+- In the **Cluster docdb-nextjs-workshop** interface, copy **Connect to this cluster with the mongo shell**, then
   paste it into EC2 to test the connection
   ![check-connect](/images/6-deploy-the-application-to-ec2/6.10.png)
   ![check-connect](/images/6-deploy-the-application-to-ec2/6.11.png)
-  - Run the following commands to check databases and collections
+- Run the following commands to check databases and collections
 
-  ```shell
-  $ show dbs
-  $ use test
-  $ show collections
-  ```
+```shell
+$ show dbs
+$ use test
+$ show collections
+```
 
-  ![check-db](/images/6-deploy-the-application-to-ec2/6.12.png)
+![check-db](/images/6-deploy-the-application-to-ec2/6.12.png)
 
-  #### 4. Add environment variables (.env)
+#### 4. Add environment variables (.env)
 
-  - Create a **.env** file to store database connection details and application configurations
+- Create a **.env** file to store database connection details and application configurations
 
-  ```shell
-  $ touch .env
-  $ nano .env
-  ```
+```shell
+$ touch .env
+$ nano .env
+```
 
-  - Add environment variables
+- Add environment variables
 
-  Download the **.env** file and add the required variables
-  **[.env](https://drive.google.com/file/d/1PH2-dZjuWKzp2cHs6MVGqb57LLpHhWoR/view?usp=sharing)**
+Download the **.env** file and add the required variables
+**[.env](https://drive.google.com/file/d/1PH2-dZjuWKzp2cHs6MVGqb57LLpHhWoR/view?usp=sharing)**
 
-  ![env](/images/6-deploy-the-application-to-ec2/6.13.png)
+![env](/images/6-deploy-the-application-to-ec2/6.13.png)
 
-  #### 5. Build and run the application
+#### 5. Build and run the application
 
-  - Build the application
+- Build the application
 
-  ```
-  npm run build
-  ```
+```
+npm run build
+```
 
-  - Run the application with PM2
+- Run the application with PM2
 
-  ```
-  pm2 start npm --name "nextjs-app" -- run start
-  pm2 save
-  pm2 startup
-  ```
+```
+pm2 start npm --name "nextjs-app" -- run start
+pm2 save
+pm2 startup
+```
 
-  - Check if the application is running
+- Check if the application is running
 
-  ```
-  pm2 list
-  ```
+```
+pm2 list
+```
 
-  ![build](/images/6-deploy-the-application-to-ec2/6.14.png)
+![build](/images/6-deploy-the-application-to-ec2/6.14.png)
 
-  #### 6. Verify deployment
+#### 6. Verify deployment
 
-  - Open a browser and visit
+- Open a browser and visit
 
-  ```
-  http://your-ec2-public-ip:3000
-  ```
+```
+http://your-ec2-public-ip:3000
+```
 
-  ![deploy](/images/6-deploy-the-application-to-ec2/6.15.png)
+![deploy](/images/6-deploy-the-application-to-ec2/6.15.png)
 
-  #### 7. Verify storage in DocumentDB
+#### 7. Verify storage in DocumentDB
 
-  - In the created cluster, copy the connection string under **Connect to this cluster with an application**
-  - In EC2, run the following command (replace **insertYourPassword** with your actual password)
+- In the created cluster, copy the connection string under **Connect to this cluster with an application**
+- In EC2, run the following command (replace **insertYourPassword** with your actual password)
 
   ```
   mongosh docdb-nextjs-workshop.cluster-c10k88ou8amc.ap-southeast-1.docdb.amazonaws.com:27017 --tls --tlsCAFile
   global-bundle.pem --retryWrites=false --username user123 --password <your-cluster-documentdb-password>
-    ```
+  ```
 
-    - Check the stored data
+- Check the stored data
 
-    ```
-    use test
-    show collections
-    db.your-collection.find().pretty()
-    ```
+  ```
+  use test
+  show collections
+  db.your-collection.find().pretty()
+  ```
 
-    ![check-database](/images/6-deploy-the-application-to-ec2/6.16.png)
+  ![check-database](/images/6-deploy-the-application-to-ec2/6.16.png)
 
-    {{< center>}}
+{{< center>}}
 
-      ### **Completed! 🚀**
+### **Completed! 🚀**
 
-      {{< /center>}}
+{{< /center>}}
