@@ -185,16 +185,16 @@ http://your-ec2-public-ip:3000
 - In EC2, run the following command (replace **insertYourPassword** with your actual password)
 
   ```
-  mongosh docdb-nextjs-workshop.cluster-c10k88ou8amc.ap-southeast-1.docdb.amazonaws.com:27017 --tls --tlsCAFile
-  global-bundle.pem --retryWrites=false --username user123 --password <your-cluster-documentdb-password>
+    mongosh docdb-nextjs-workshop.cluster-c10k88ou8amc.ap-southeast-1.docdb.amazonaws.com:27017 --tls --tlsCAFile
+    global-bundle.pem --retryWrites=false --username user123 --password <your-cluster-documentdb-password>
   ```
 
 - Check the stored data
 
   ```
-  use test
-  show collections
-  db.your-collection.find().pretty()
+    use test
+    show collections
+    db.your-collection.find().pretty()
   ```
 
   ![check-database](/images/6-deploy-the-application-to-ec2/6.16.png)
